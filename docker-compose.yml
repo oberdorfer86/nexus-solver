@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    # container_name: calculadora_web_service  <-- REMOVIDO propositalmente para permitir múltiplas versões (v1, v2)
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app
+    # O comando abaixo ativa o modo de desenvolvimento com reload automático
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
