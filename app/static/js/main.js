@@ -9,19 +9,51 @@ window.onload = function() {
     
     // Container do Gráfico (DIV do Plotly)
     const plotContainer = getEl('plot-container');
-    const plotlyDivId = 'plotly-graph'; // ID interno da div do gráfico
+    const plotlyDivId = 'plotly-graph'; 
     
     const calculateBtn = getEl('calculate-btn');
     const clearBtn = getEl('clear-btn');
     const saveVarBtn = getEl('save-var-btn'); 
     
     const latexInput = getEl('latex-code');
-    const excelInput = getEl('excel-code');
+    // CORRIGIDO: getG alterado para getEl
+    const excelInput = getEl('excel-code'); 
     const calcLabelInput = getEl('calc-label');
     
     const historyList = getEl('history-list');
     const variablesList = getEl('variables-list');
     const addVariableBtn = getEl('add-variable-btn');
+
+    // --- LÓGICA DO BOTÃO CALCULAR ---
+    const CALCULATE_NORMAL_HTML = `<span class="material-icons-round calculate-icon">calculate</span> Calcular`;
+    const CALCULATE_LOADING_HTML = `<span class="material-icons-round loading-icon">autorenew</span> Calculando...`;
+
+    // Garante que o botão esteja no estado NORMAL no início
+    if (calculateBtn) {
+        calculateBtn.innerHTML = CALCULATE_NORMAL_HTML;
+        calculateBtn.classList.remove('loading');
+    }
+    // --- FIM LÓGICA BOTÃO ---
+
+    // --- LÓGICA DA SIDEBAR DESLIZANTE (NEXUS SLIDER) ---
+    const sidebar = getEl('app-sidebar');
+    const sidebarToggle = getEl('sidebar-toggle');
+
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Fecha a sidebar se clicar fora dela (UX para telas menores)
+        document.addEventListener('click', (e) => {
+            const isClickInsideSidebar = sidebar.contains(e.target);
+            const isClickOnToggle = sidebarToggle.contains(e.target);
+            
+            if (sidebar.classList.contains('open') && !isClickInsideSidebar && !isClickOnToggle) {
+                sidebar.classList.remove('open');
+            }
+        });
+    }
 
     // --- FUNÇÕES AUXILIARES ---
     function cleanMathString(str) {
@@ -67,7 +99,7 @@ window.onload = function() {
         }
     } catch (e) { console.error("Erro MathLive:", e); }
 
-    // --- HISTÓRICO & VARIÁVEIS (MANTER LÓGICA EXISTENTE) ---
+    // --- HISTÓRICO ---
     let calculationHistory = JSON.parse(localStorage.getItem('engineer_v5_history') || '[]');
     function updateHistoryUI() {
         if (!historyList) return;
@@ -167,7 +199,7 @@ window.onload = function() {
         renderVariables();
     }
 
-    // --- 5. FUNÇÃO DE CÁLCULO (ATUALIZADA PARA PLOTLY) ---
+    // --- 5. FUNÇÃO DE CÁLCULO (COM PLOTLY) ---
     async function performCalculation() {
         if (!mf) return;
         
@@ -185,14 +217,14 @@ window.onload = function() {
 
         if (calculateBtn) {
             calculateBtn.disabled = true;
+            // Estado Loading: Altera o HTML e adiciona a classe
             calculateBtn.classList.add('loading');
-            calculateBtn.innerHTML = '<span class="material-icons-round loading-icon">autorenew</span> Calculando...';
+            calculateBtn.innerHTML = CALCULATE_LOADING_HTML; 
         }
         
         if (resultMf) resultMf.setValue("\\text{Calculando...}");
         if (resultCard) resultCard.classList.remove('hidden');
         
-        // Esconde o container do gráfico temporariamente
         if (plotContainer) plotContainer.style.display = 'none';
 
         try {
@@ -208,11 +240,12 @@ window.onload = function() {
                 addToHistory(latexVal, data.result_latex, calcLabel);
                 updateTechPane(); 
 
-                // --- RENDERIZAÇÃO PLOTLY (INTERATIVO) ---
+                // --- RENDERIZAÇÃO PLOTLY ---
                 if (data.plot_data) {
                     if (plotContainer) {
                         plotContainer.style.display = 'flex';
-                        // Layout profissional de engenharia
+                        
+                        // Layout do Plotly (Mantido)
                         const layout = {
                             margin: { t: 20, r: 20, b: 40, l: 50 },
                             paper_bgcolor: 'rgba(0,0,0,0)',
@@ -229,34 +262,30 @@ window.onload = function() {
                             hovermode: 'closest'
                         };
                         
-                        // Configuração do Traço
                         const trace = {
                             x: data.plot_data.x,
                             y: data.plot_data.y,
                             mode: 'lines',
-                            line: { color: '#2563eb', width: 3 },
+                            line: { color: '#3b82f6', width: 3 },
                             name: 'f(x)',
                             type: 'scatter'
                         };
 
-                        // Configuração Responsiva e Botões
                         const config = {
                             responsive: true,
                             displayModeBar: true,
                             displaylogo: false,
-                            modeBarButtonsToRemove: ['lasso2d', 'select2d'], // Remove botões desnecessários
+                            modeBarButtonsToRemove: ['lasso2d', 'select2d'],
                             toImageButtonOptions: {
-                                format: 'png', filename: 'grafico_engenharia',
+                                format: 'png', filename: 'nexus_grafico',
                                 height: 600, width: 1200, scale: 2
                             }
                         };
 
                         Plotly.newPlot(plotlyDivId, [trace], layout, config);
-                        
                         setTimeout(() => { plotContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
                     }
                 } else {
-                    // Limpa o gráfico se não houver dados
                     if (plotContainer) plotContainer.style.display = 'none';
                 }
 
@@ -269,8 +298,9 @@ window.onload = function() {
         } finally {
             if (calculateBtn) {
                 calculateBtn.disabled = false;
+                // Estado Normal: Remove a classe e restaura o HTML 
                 calculateBtn.classList.remove('loading');
-                calculateBtn.innerHTML = '<span class="material-icons-round calculate-icon">calculate</span> Calcular';
+                calculateBtn.innerHTML = CALCULATE_NORMAL_HTML; 
             }
             mf.focus(); 
         }
@@ -286,6 +316,7 @@ window.onload = function() {
         mf.focus();
     });
 
+    // --- TOOLBAR CLICK ---
     const toolbar = document.querySelector('.toolbar-content');
     if (toolbar) toolbar.addEventListener('click', (e) => {
         const btn = e.target.closest('.toolbar-btn');
@@ -295,6 +326,7 @@ window.onload = function() {
         }
     });
 
+    // --- NAVEGAÇÃO POR ABAS ---
     const tabsContainer = document.querySelector('.toolbar-tabs');
     if (tabsContainer) tabsContainer.addEventListener('click', (e) => {
         const clickedTab = e.target.closest('.tab');
@@ -307,6 +339,7 @@ window.onload = function() {
         if (mf) mf.focus();
     });
 
+    // --- TEMA DARK/LIGHT (COM ATUALIZAÇÃO PLOTLY) ---
     const themeBtn = getEl('theme-toggle-btn');
     if (themeBtn) themeBtn.addEventListener('click', () => {
         const html = document.documentElement;
@@ -314,7 +347,6 @@ window.onload = function() {
         html.setAttribute('data-theme', next);
         themeBtn.querySelector('span').textContent = next === 'light' ? 'dark_mode' : 'light_mode';
         
-        // Atualiza cor do gráfico no Dark Mode
         const plotEl = getEl(plotlyDivId);
         if (plotEl && plotEl.data) {
             const gridColor = next === 'dark' ? '#374151' : '#e5e7eb';

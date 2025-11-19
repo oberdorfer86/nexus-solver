@@ -4,3 +4,5 @@ jinja2
 sympy
 matplotlib
 numpy
+pydantic
+multipart

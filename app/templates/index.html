@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', path='img/nexus_logo.png') }}">
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=7.3">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?v=7.4">
     
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
 </head>
@@ -31,59 +31,116 @@
             <div class="toolbar-container">
                 <div class="toolbar-tabs">
                     <span class="tab active" data-target="geral">Geral</span>
-                    <span class="tab" data-target="trigonometria">Trigonometria</span>
+                    <span class="tab" data-target="trigonometria">Trig</span>
+                    <span class="tab" data-target="funcoes">Funções</span>
                     <span class="tab" data-target="calculo">Cálculo</span>
-                    <span class="tab" data-target="estrutural">Estrutural</span> 
+                    <span class="tab" data-target="matriz">Matriz</span>
                 </div>
 
                 <div class="toolbar-content">
+                    
                     <div id="geral" class="toolbar-pane active">
-                        <div id="toolbar-geral">
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" data-latex="x^2">x<sup>2</sup></button>
-                                <button class="toolbar-btn" data-latex="x^{\placeholder{}}">x<sup class="square small"></sup></button>
-                                <button class="toolbar-btn" data-latex="\sqrt{\placeholder{}}">√<span class="square"></span></button>
-                                <button class="toolbar-btn" data-latex="\frac{\placeholder{}}{\placeholder{}}">
-                                    <span class="fraction-icon"><span class="square"></span><span class="bar"></span><span class="square"></span></span>
-                                </button>
-                                <button class="toolbar-btn" data-latex="\sqrt[\placeholder{}]{\placeholder{}}">
-                                    <sup class="square small" style="top: -0.5em;"></sup>√<span class="square"></span>
-                                </button>
-                                <button class="toolbar-btn" data-latex="\left(\placeholder{}\right)">( )</button>
-                                <button class="toolbar-btn" data-latex="\cdot">⋅</button>
-                                <button class="toolbar-btn" data-latex="=">=</button> 
-                            </div>
+                        <div class="toolbar-group">
+                            <button class="toolbar-btn" data-latex="x^2" title="Quadrado">x²</button>
+                            
+                            <button class="toolbar-btn" data-latex="\sqrt{\placeholder{}}" title="Raiz Quadrada">
+                                <span class="root-symbol">√</span><span class="square-placeholder"></span>
+                            </button>
+                            
+                            <button class="toolbar-btn" data-latex="^{\placeholder{}}" title="Potência">
+                                x<span class="square-placeholder small"></span>
+                            </button>
+                            
+                            <button class="toolbar-btn" data-latex="\frac{\placeholder{}}{\placeholder{}}" title="Fração">
+                                <div class="fraction-icon">
+                                    <span class="square-placeholder small"></span>
+                                    <span class="fraction-line"></span>
+                                    <span class="square-placeholder small"></span>
+                                </div>
+                            </button>
+
+                            <button class="toolbar-btn" data-latex="^{-1}" title="Inverso">x⁻¹</button>
+                            
                             <div class="divider"></div>
-                            <div class="toolbar-group">
-                                <button class="toolbar-btn" data-latex="\pi">π</button>
-                                <button class="toolbar-btn" data-latex="\mu">μ</button>
-                            </div>
+                            
+                            <button class="toolbar-btn" data-latex="\left(\placeholder{}\right)" title="Parênteses">( )</button>
+                            <button class="toolbar-btn" data-latex="\pi" title="Pi">π</button>
+                            <button class="toolbar-btn" data-latex="e" title="Euler">e</button>
+                            <button class="toolbar-btn" data-latex="\%" title="Porcentagem">%</button>
+                            
+                            <div class="divider"></div>
+
+                             <button class="toolbar-btn action-btn" onclick="document.getElementById('math-editor').executeCommand('deleteBackward')" title="Backspace">⌫</button>
                         </div>
                     </div>
                     
                     <div id="trigonometria" class="toolbar-pane hidden">
-                        <div id="toolbar-trigonometria">
-                             <div class="toolbar-group">
-                                <button class="toolbar-btn" data-latex="\sin\left(\placeholder{}\right)">sin</button>
-                                <button class="toolbar-btn" data-latex="\cos\left(\placeholder{}\right)">cos</button>
-                                <button class="toolbar-btn" data-latex="\tan\left(\placeholder{}\right)">tan</button>
-                                <button class="toolbar-btn" data-latex="\pi">π</button>
-                            </div>
+                        <div class="toolbar-group">
+                            <span style="font-size: 0.7rem; color:var(--text-muted); border:1px solid var(--border); padding:2px 5px; border-radius:4px; margin-right:5px;">DEG</span>
+
+                            <button class="toolbar-btn" data-latex="\sin\left(\placeholder{}\right)">sin</button>
+                            <button class="toolbar-btn" data-latex="\cos\left(\placeholder{}\right)">cos</button>
+                            <button class="toolbar-btn" data-latex="\tan\left(\placeholder{}\right)">tan</button>
+                            
+                            <div class="divider"></div>
+                            
+                            <button class="toolbar-btn" data-latex="\arcsin\left(\placeholder{}\right)">sin⁻¹</button>
+                            <button class="toolbar-btn" data-latex="\arccos\left(\placeholder{}\right)">cos⁻¹</button>
+                            <button class="toolbar-btn" data-latex="\arctan\left(\placeholder{}\right)">tan⁻¹</button>
+                        </div>
+                    </div>
+
+                    <div id="funcoes" class="toolbar-pane hidden">
+                        <div class="toolbar-group">
+                            <button class="toolbar-btn" data-latex="\log\left(\placeholder{}\right)">log</button>
+                            <button class="toolbar-btn" data-latex="\ln\left(\placeholder{}\right)">ln</button>
+                            
+                            <button class="toolbar-btn" data-latex="\log_{\placeholder{}}\left(\placeholder{}\right)" title="Log Base N">
+                                log<span class="square-placeholder sub"></span>
+                            </button>
+                            
+                            <button class="toolbar-btn" data-latex="10^{\placeholder{}}">
+                                10<span class="square-placeholder small"></span>
+                            </button>
+                            
+                            <div class="divider"></div>
+                            
+                            <button class="toolbar-btn" data-latex="!" title="Fatorial">n!</button>
+                            <button class="toolbar-btn" data-latex="\left|\placeholder{}\right|" title="Módulo">|x|</button>
                         </div>
                     </div>
 
                     <div id="calculo" class="toolbar-pane hidden">
-                        <div id="toolbar-calculo">
-                             <div class="toolbar-group">
-                                <button class="toolbar-btn" data-latex="\int \placeholder{} dx">∫</button>
-                                <button class="toolbar-btn" data-latex="\frac{d}{dx}">d/dx</button>
-                            </div>
+                        <div class="toolbar-group">
+                            <button class="toolbar-btn" data-latex="\int \placeholder{} dx">∫</button>
+                            
+                            <button class="toolbar-btn" data-latex="\int_{\placeholder{}}^{\placeholder{}} \placeholder{} dx">
+                                ∫<span class="square-placeholder sub" style="margin-left:-3px"></span><span class="square-placeholder small" style="margin-left:-3px; vertical-align: super;"></span>
+                            </button>
+                            
+                            <button class="toolbar-btn" data-latex="\frac{d}{dx}">d/dx</button>
+                            
+                            <div class="divider"></div>
+                            
+                            <button class="toolbar-btn" data-latex="\sum_{\placeholder{}}^{\placeholder{}}">
+                                ∑<span class="square-placeholder sub" style="margin-left:-3px"></span><span class="square-placeholder small" style="margin-left:-3px; vertical-align: super;"></span>
+                            </button>
+                            
+                            <button class="toolbar-btn" data-latex="\lim_{x \to \infty}">lim</button>
+                            <button class="toolbar-btn" data-latex="\infty">∞</button>
                         </div>
                     </div>
 
-                    <div id="estrutural" class="toolbar-pane hidden">
+                    <div id="matriz" class="toolbar-pane hidden">
                          <div class="toolbar-group">
-                            <span style="color: var(--text-muted);">Em desenvolvimento...</span>
+                            <button class="toolbar-btn" data-latex="\begin{bmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{bmatrix}" title="Matriz 2x2" style="font-size: 0.8rem;">[2x2]</button>
+                            <button class="toolbar-btn" data-latex="\begin{bmatrix}\placeholder{} \\ \placeholder{}\end{bmatrix}" title="Vetor 2D" style="font-size: 0.8rem;">[2x1]</button>
+                            
+                            <div class="divider"></div>
+
+                            <button class="toolbar-btn" data-latex="\det\left(\placeholder{}\right)" style="font-size: 1rem;">det</button>
+                            <button class="toolbar-btn" data-latex="^T" title="Transposta">ᵀ</button>
+                            <button class="toolbar-btn" data-latex="^{-1}" title="Inversa">⁻¹</button>
                         </div>
                     </div>
                 </div>
@@ -163,7 +220,7 @@
 
         </main>
 
-        <aside class="sidebar">
+        <aside class="sidebar" id="app-sidebar">
             <div class="sidebar-header">
                 <h2><span class="material-icons-round">history</span> Memória</h2>
                 <button id="clear-history-btn" class="btn-text">Limpar</button>
@@ -178,10 +235,15 @@
             </div>
         </aside>
 
+        <button id="sidebar-toggle" title="Abrir/Fechar Histórico">
+            <span class="material-icons-round" id="toggle-icon">chevron_left</span>
+            Memória
+        </button>
+
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script defer src="//unpkg.com/mathlive"></script>
-    <script src="{{ url_for('static', path='js/main.js') }}?v=7.3"></script> 
+    <script src="{{ url_for('static', path='js/main.js') }}?v=7.4"></script> 
 </body>
 </html>
