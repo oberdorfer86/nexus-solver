@@ -1,3 +1,4 @@
+/* Bloco 1: Variáveis, Reset e Configuração Dark Mode */
 :root {
     --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     
@@ -14,12 +15,11 @@
     --text-muted: #6b7280;
     --border: #e5e7eb;
     
-    /* Cores de Estado */
-    --danger: #ef4444; 
-    --danger-light: #fef2f2;
-    
     --radius: 12px;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    
+    --danger: #ef4444;
+    --danger-light: #fef2fef;
 }
 
 html[data-theme="dark"] {
@@ -50,6 +50,7 @@ body {
     overflow: hidden; 
 }
 
+/* Bloco 2: Layout Base e Main Content */
 /* === LAYOUT NEXUS (Slide Sidebar) === */
 .app-layout {
     position: relative;
@@ -65,12 +66,15 @@ body {
     overflow-y: auto; 
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    /* CORREÇÃO CRÍTICA: Remover o gap do main-content para permitir que os painéis Toolbar/Formula se sobreponham no fluxo */
+    gap: 0; 
     padding-right: 60px; 
+    padding-left: 60px; /* Adicionado padding para os toggles */
     transition: margin-right 0.3s;
 }
 
-/* Sidebar Deslizante (Off-Canvas) */
+/* Bloco 3: Sidebar Histórico (Direita) */
+/* Sidebar Histórico (Antigo Memória) */
 .sidebar {
     position: fixed;
     top: 0;
@@ -82,7 +86,8 @@ body {
     padding: 25px;
     display: flex;
     flex-direction: column;
-    z-index: 1000;
+    /* ALTERADO: Aumenta o Z-index para sobrepor o Memorial (1500) */
+    z-index: 1700; 
     box-shadow: -5px 0 15px rgba(0,0,0,0.05);
     
     transform: translateX(100%);
@@ -93,11 +98,14 @@ body {
     transform: translateX(0); 
 }
 
-/* Botão Gaveta (Handle - Seta no Sentido Correto) */
+/* ======================================================= */
+/* REPOSICIONAMENTO: Botão Histórico (Gaveta Direita) */
+/* ======================================================= */
 #sidebar-toggle {
     position: fixed;
     top: 50%;
-    right: 0;
+    /* POSIÇÃO FIXA: 0px à direita + 30px de padding do main-content */
+    right: 30px; 
     transform: translateY(-50%);
     
     /* DIMENSÕES E ESTILO PARA O TEXTO VERTICAL */
@@ -109,12 +117,12 @@ body {
     
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-right: none;
-    border-radius: 8px 0 0 8px;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+    border-radius: 8px; /* Borda completa */
+    box-shadow: var(--shadow);
     
     cursor: pointer;
-    z-index: 1001; 
+    /* ALTERADO: Ajusta o Z-index para ficar acima da própria gaveta Histórico (1700) */
+    z-index: 1800; 
     
     /* Alinhamento Icone + Texto */
     display: flex;
@@ -132,28 +140,40 @@ body {
     width: 35px;
 }
 #sidebar-toggle span {
-    font-size: 1.8rem; /* Aumentado o tamanho da seta aqui! */
-    /* CORREÇÃO: Gira a seta para apontar para a esquerda (sentido de abertura) */
+    font-size: 1.8rem; 
+    /* Gira a seta para apontar para a esquerda (sentido de abertura) */
     transform: rotate(-90deg); 
     transition: transform 0.3s ease-in-out;
 }
 
 
-/* Botão acompanha a sidebar quando abre */
+/* Botão acompanha a sidebar quando abre (Desloca para a esquerda) */
 .sidebar.open ~ #sidebar-toggle {
-    right: 320px;
+    right: 350px; /* 320px (sidebar) + 30px (padding/margem) */
 }
 .sidebar.open ~ #sidebar-toggle span {
-    /* CORREÇÃO: Seta aponta para a direita (indicando fechar) */
+    /* Seta aponta para a direita (indicando fechar) */
     transform: rotate(90deg);
 }
 
+/* NOVO: Classe para ocultar os toggles em mobile quando o teclado ou outra gaveta está aberta */
+/* Também esconde os toggles por padrão em desktop, confiando no JS para mostrá-los/escondê-los */
+#sidebar-toggle.hidden, #memorial-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+/* Nova classe para forçar o botão a desaparecer em breakpoints específicos */
+.toggle-hidden {
+    display: none !important;
+}
 
+/* Bloco 4: Estilos Gerais (Header, Título) */
 /* === HEADER & LOGO === */
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 25px; /* Adiciona o gap removido do main-content */
 }
 
 .brand {
@@ -165,89 +185,181 @@ body {
 h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 
 
+/* Bloco 5: Estilos da Toolbar/Abas de Navegação (Master-Detail) */
 /* === TOOLBAR (Horizontal Fix) === */
-.toolbar-container {
-    background: var(--bg-card);
-    padding: 20px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
+#tab-controls-container {
+    /* Container para posicionar as abas LADO A LADO FIXAS */
+    display: flex;
+    gap: 5px;
+    margin-bottom: 0; /* Remove a margem para colar no conteúdo */
+    z-index: 10; 
 }
 
-.toolbar-tabs {
+/* Estilo Base para as Abas (Handles) */
+.tab-handle {
+    position: relative; /* Mantém no fluxo normal */
+    height: 40px; 
+    width: 180px; /* AJUSTADO: Largura estreita da aba */
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    cursor: pointer;
+    transition: all 0.3s;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 15; /* Alto Z-index para flutuar */
+}
+/* Estilo para o Título do Handle */
+.tab-handle .handle-title, .tab-handle h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+/* ABA INATIVA - Fica atrás, com borda escura */
+.tab-handle.inactive {
+    z-index: 10;
+    border-color: var(--border);
+    color: var(--text-muted);
+    background: var(--bg-app); /* Fundo mais escuro */
+}
+/* Aba inativa quando hover */
+.tab-handle.inactive:hover {
+    background: var(--bg-card);
+    color: var(--primary);
+}
+
+/* ABA ATIVA - Fica na frente, com borda clara, e "corta" a borda de baixo */
+.tab-handle.active {
+    z-index: 20;
+    border-color: var(--border);
+    color: var(--primary);
+    background: var(--bg-card);
+    /* Desloca 1px para baixo para cobrir a linha do painel de conteúdo abaixo */
+    margin-top: 1px; 
+    height: 39px; 
+}
+
+/* ---------------------------------------------------- */
+/* Lógica de Conteúdo Compartilhado */
+/* ---------------------------------------------------- */
+
+#tab-content-area {
+    /* Reposiciona o conteúdo para cobrir a área abaixo das abas */
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-top: -1px; /* Cola na aba ativa */
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0 var(--radius) var(--radius) var(--radius); /* Arredonda todos, exceto canto superior esquerdo para dar espaço para o handle */
+    padding: 20px;
+    box-shadow: var(--shadow);
+    z-index: 1; /* Fica abaixo dos handles */
+}
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* NOVO: Estilo para os Títulos de Seção de Funções/Fórmulas */
+.toolbar-section-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    background-color: var(--bg-app);
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+/* Garante que o conteúdo da aba Funções/Fórmulas flua verticalmente */
+#toolbar-content-area .toolbar-content, #formula-content-area {
+    display: block !important; 
+    padding-top: 0;
+}
+#toolbar-content-area .toolbar-pane, #formula-content-area .formula-pane {
+    /* Garante que todos os painéis internos estejam visíveis no fluxo único */
+    display: block !important; 
+    padding: 0; /* Remove padding desnecessário */
+}
+
+
+/* NÍVEL 2: CATEGORIAS (Navegação Master-Detail REMOVIDA) */
+.toolbar-tabs, .formula-category-list {
+    /* Oculta as listas de navegação verticais de ambas as abas */
+    display: none; 
+    flex-wrap: wrap; 
+    gap: 10px;
     margin-bottom: 15px;
     border-bottom: 1px solid var(--border);
     padding-bottom: 10px;
-    overflow-x: auto; 
 }
 
-.tab {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding-bottom: 10px;
-    margin-bottom: -11px;
-    white-space: nowrap;
-    transition: color 0.2s;
-}
-.tab:hover, .tab.active { color: var(--primary); }
-.tab.active { border-bottom: 2px solid var(--primary); }
+/* NÍVEL 3: COMANDOS DE CÁLCULO (Agrupamento Vertical) */
 
-.toolbar-pane { display: none; }
-.toolbar-pane.active { display: block; }
-
-/* Container Flex para os Grupos (Horizontal) */
-.toolbar-pane > div { 
+.toolbar-pane > div, .formula-content-details { 
+    /* Container que contém todos os grupos (Deve ser VERTICAL) */
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
+    flex-direction: column;
+    gap: 15px; /* Espaçamento entre grupos de botões */
+    padding-top: 5px; /* Reduzido o padding top */
+}
+/* O formula-content-details já está com display block acima, vamos garantir o reset */
+.formula-content-details {
+    display: block !important;
+    margin-top: 0;
 }
 
-/* Grupos de Botões (Largura Automática) */
+
+/*Correção Definitiva – Grid das Funções */
 .toolbar-group {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap; 
+    display: grid !important;          /* Força o grid a prevalecer */
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+
+    width: 100% !important;            /* Garante largura total */
+    box-sizing: border-box !important;
+
+    /* Evita colapso do grid por herança externa */
     align-items: center;
-    width: auto; 
-    gap: 5px;
-    margin-bottom: 0;
+    justify-items: center;
+
+    /* Remove possíveis interferências anteriores */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    overflow-x: hidden;
 }
 
+
+/* CORREÇÃO CRÍTICA: O Separador AGORA é 100% Horizontal */
 .divider {
-    width: 1px;
-    height: 32px;
+    width: 100%; /* Força a linha horizontal */
+    height: 1px;
     background: var(--border);
-    margin: 0 10px;
-    display: inline-block;
+    margin: 10px 0; /* Espaçamento vertical para separação de grupos */
+    display: block;
 }
 
-.toolbar-btn {
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    color: var(--text-main);
-    cursor: pointer;
-    min-width: 42px; 
-    height: 40px;
-    font-family: "Times New Roman", serif;
-    font-size: 1.2rem;
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+/* FÓRMULAS DETALHE (Conteúdo Nível 3) */
+.formula-content-details h3, .formula-content-details h2 {
+    /* Oculta os cabeçalhos H2/H3 internos, pois usamos .toolbar-section-title */
+    display: none !important; 
 }
-.toolbar-btn:hover {
-    background: var(--bg-app);
-    border-color: var(--border);
+.formula-content-details .formula-pane {
+    /* Ajuste para remover o padding-bottom padrão */
+    padding-bottom: 0; 
 }
-.action-btn { font-family: var(--font-sans); font-size: 1rem; }
 
-
+/* Bloco 6: Estilos de Notação Matemática (Placeholders, Raiz, Fração) */
 /* === ÍCONES VISUAIS (Placeholder Quadrados) === */
 .square-placeholder {
     display: inline-block;
@@ -274,23 +386,36 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 .root-symbol { font-family: serif; font-size: 1.1em; }
 
 
-/* === EDITOR & INPUT === */
+/* Bloco 7: Estilos da Seção Editor (Card, Variáveis, Input)
+/* === EDITOR & INPUT (CORREÇÃO DE LAYOUT) === */
 .editor-section {
     display: flex;
     flex-direction: column;
     gap: 0;
+    /* NOVO: Aplica o arredondamento ao container principal do editor/variáveis */
+    border-radius: var(--radius); 
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border); /* Adiciona borda única ao container */
+    background: var(--bg-card); /* Define o background principal */
+    margin-bottom: 25px; /* Adiciona o gap para o próximo elemento */
+    
+    /* CRÍTICO: Ajusta a margem superior para colar no conteúdo da aba ativa (que agora é o elemento ANTERIOR) */
+    margin-top: 25px; 
+    z-index: 1;
 }
 
+/* Painel de Variáveis - Topo do Cartão */
 .variables-panel {
     background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-bottom: none;
-    border-radius: var(--radius) var(--radius) 0 0;
+    border: none; /* Borda movida para o .editor-section */
+    border-bottom: 1px solid var(--border); /* Linha divisória entre painéis */
+    /* Removido border-radius superior para que cole nas abas */
+    border-radius: var(--radius) var(--radius) 0 0; /* CORREÇÃO: Volta o radius superior para o .variables-panel, pois ele está abaixo das abas. */
     padding: 15px 20px;
     margin-bottom: 0; 
     position: relative;
     z-index: 2;
-    box-shadow: var(--shadow);
+    box-shadow: none; 
 }
 
 .variables-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -309,11 +434,67 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     border-radius: 6px; overflow: hidden; transition: all 0.2s; padding: 0; height: 38px;
 }
 .variable-item:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+
+/* --- CORREÇÃO CRÍTICA PARA ÍCONES DO MATHLIVE NA VARIÁVEL (USANDO ::part) --- */
+.variable-item .var-value-editor::part(menu-toggle),
+.variable-item .var-value-editor::part(virtual-keyboard-toggle) {
+    display: none !important;
+}
+/* ----------------------------------------------------------- */
+
+/* Botão de Inserção de Variável (Extrema Esquerda) */
+.variable-item .insert-var-btn {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 38px; /* Largura igual à altura */
+    height: 100%; 
+    font-size: 1.1rem; 
+    color: var(--primary); 
+    cursor: pointer; 
+    transition: all 0.2s;
+    background: rgba(59, 130, 246, 0.08); /* Fundo sutil */
+    border-right: 1px solid var(--border); /* Separador visual */
+}
+.variable-item .insert-var-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Estilo para inputs de Nome e Unidade */
 .variable-item input { background: transparent; border: none; height: 100%; font-size: 0.9rem; color: var(--text-main); padding: 0 8px; outline: none; }
 
-.variable-item .var-name { width: 55px; font-weight: 700; color: var(--primary); text-align: center; border-right: 1px solid var(--border); background: rgba(59, 130, 246, 0.05); }
-.variable-item .var-value { flex-grow: 1; min-width: 0; font-family: monospace; }
+.variable-item .var-name { width: 55px; font-weight: 700; color: var(--primary); text-align: center; border-right: 1px solid var(--border); background: transparent; padding: 0 4px; }
 .variable-item .var-unit { width: 60px; color: var(--text-muted); font-size: 0.8rem; text-align: center; border-left: 1px solid var(--border); background: rgba(0,0,0, 0.02); }
+
+/* NOVO ESTILO: Math-field para o valor da variável */
+.variable-item .var-value-editor {
+    flex-grow: 1; 
+    /* CRÍTICO: Garante que o item encolha e não force o transbordamento */
+    min-width: 0; 
+    /* CRÍTICO: Força o estouro a ser ocultado, permitindo o truncamento se o valor for muito longo */
+    overflow: hidden; 
+    height: 100%;
+    /* Redefine os estilos do math-field para ser um campo de texto inline */
+    background: transparent;
+    border: none;
+    padding: 0 8px;
+    font-size: 0.95rem; /* Um pouco maior que o input normal */
+    color: var(--text-main);
+    outline: none;
+    /* Fonte MathLive para renderização */
+    font-family: 'KaTeX_Main', 'KaTeX_Math', serif !important;
+    
+    /* CRÍTICO: Garante que o MathLive se comporte como um item flexível */
+    display: flex !important;
+    align-items: center; 
+    justify-content: flex-start;
+}
+
+.variable-item .var-value-editor::placeholder {
+    color: var(--text-muted);
+}
+
 .variable-item .delete-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 100%; font-size: 1.1rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
 .variable-item .delete-btn:hover { background: var(--danger-light); color: var(--danger); }
 .variable-item .restore-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 100%; font-size: 1.1rem; color: var(--primary); cursor: pointer; border-left: 1px solid var(--border); transition: all 0.2s; }
@@ -326,44 +507,77 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 .variable-item:hover::after { content: ''; position: absolute; bottom: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; opacity: 0; animation: fadeIn 0.2s forwards; }
 @keyframes fadeIn { to { opacity: 1; } }
 
+/* Wrapper do Input - Base do Cartão */
 .unified-input-wrapper {
     background: var(--bg-card);
-    border-radius: 0 0 var(--radius) var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    display: flex; flex-direction: column; gap: 0; margin-top: -1px; position: relative; z-index: 3;
+    border-radius: 0 0 var(--radius) var(--radius); /* Arredonda só embaixo */
+    border: none; /* Borda movida para o .editor-section */
+    box-shadow: none; /* Sombra movida para o .editor-section */
+    display: flex; flex-direction: column; gap: 0; 
+    margin-top: 0; /* Remove a margem superior */
+    position: relative; z-index: 3;
 }
 
 .label-group { margin: 0; padding: 10px 10px 0 10px; border-bottom: 1px solid var(--border); }
 #calc-label { width: 100%; padding: 0 0 10px 0; border: none; background: transparent; color: var(--text-muted); font-size: 0.9rem; outline: none; }
 
-.input-group { border: none; box-shadow: none; padding: 0 10px 10px 10px; margin: 0; display: flex; gap: 10px; align-items: flex-start; }
+.input-group { 
+    border: none; 
+    box-shadow: none; 
+    padding: 0 10px 10px 10px; 
+    margin: 0; 
+    display: flex; 
+    gap: 10px; 
+    align-items: flex-start;
+    cursor: text !important; /* CORREÇÃO: Aplica cursor ao grupo pai */
+}
 
+/* CORREÇÃO CRÍTICA: Força a herança da fonte MathLive para garantir a renderização */
 math-field {
     flex-grow: 1; 
     background: transparent; 
     border: none; 
     font-size: 1.8rem; 
     padding: 10px 0 0 0; 
+    padding-bottom: 40px; 
+    min-height: 50px; 
+    cursor: text; 
     color: var(--text-main);
     
     width: 100%; 
     box-sizing: border-box; 
 
     margin-right: 20px; 
-    font-family: "KaTeX_Main", "Times New Roman", serif !important;
+    /* Esta linha é crucial para garantir que as fontes sejam aplicadas */
+    font-family: 'KaTeX_Main', 'KaTeX_Math', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_Typewriter', serif !important;
 }
 
 math-field:focus, math-field:focus-within { outline: none; }
 
-/* CORREÇÃO DE LARGURA DO CONTAINER DO BOTÃO */
+/* CORREÇÃO CRÍTICA: GARANTE A VISIBILIDADE DOS BOTÕES DE AÇÃO */
 .editor-actions { 
-    display: flex; flex-direction: column; gap: 8px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
     align-items: center; 
-    width: 140px; /* AUMENTADO DE 120px para 140px */
+    width: 140px; 
 }
 
-.btn-icon { background: transparent; border: 1px solid var(--border); color: var(--text-muted); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+/* REFORÇO CRÍTICO: Garantir que o display flex seja absoluto para estes botões, resolvendo o problema visual */
+.btn-icon { 
+    background: transparent; 
+    border: 1px solid var(--border); 
+    color: var(--text-muted); 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    display: flex !important; /* REFORÇO CRÍTICO */
+    align-items: center; 
+    justify-content: center; 
+    transition: all 0.2s; 
+}
+.btn-icon:hover { color: var(--primary); border-color: var(--primary); }
 .btn-icon.danger { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
 .btn-icon.danger:hover { background: var(--danger); color: white; }
 
@@ -374,14 +588,100 @@ math-field:focus, math-field:focus-within { outline: none; }
     border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; white-space: nowrap;
 }
 .btn-primary:hover { background: var(--primary-hover); }
-.btn-primary.danger { background: var(--bg-card); color: var(--danger) !important; border: 1px solid var(--danger) !important; }
+/* Estilo do botão Limpar (agora usa btn-primary danger) */
+.btn-primary.danger { 
+    background: var(--bg-card); 
+    color: var(--danger) !important; 
+    border: 1px solid var(--danger) !important;
+}
 .btn-primary.danger:hover { background: var(--danger-light); }
+
 .btn-primary:disabled, .btn-primary.loading { cursor: not-allowed; opacity: 0.8; background: var(--primary); }
 .btn-primary.loading .loading-icon { display: inline-flex; animation: rotate 1s linear infinite; }
 .btn-primary.loading .calculate-icon { display: none; }
 @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 
+/* CORREÇÃO CRÍTICA: Botões da Toolbar na gaveta NEXUS Library */
+.toolbar-group .toolbar-btn {
+    width: 100% !important;         /* Ocupa toda a célula do grid */
+    height: 70px !important;        /* Aumenta a altura dos botões */
+    font-size: 1.4rem !important;   /* Aumenta o tamanho dos símbolos */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border);
+    background: var(--bg-app);
+    color: var(--text-main);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+
+.toolbar-group .toolbar-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+/* Força 4 colunas no grupo de botões usando CSS Grid */
+.toolbar-group {
+    /* ALTERAÇÃO CRÍTICA: Mudar de Flexbox para Grid */
+    display: grid;
+    /* Divide o espaço em 4 colunas iguais */
+    grid-template-columns: repeat(4, 1fr);
+    /* Mantido 10px de espaçamento */
+    gap: 10px; 
+    
+    /* Garantias de Layout */
+    /* CRÍTICO: Removendo width: 100% e margin: 0 */
+    
+    /* Remove a barra de rolagem horizontal se não for necessária */
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.toolbar-group::-webkit-scrollbar {
+    display: none;
+}
+/* Fim da Correção Crítica da Toolbar */
+
+/* NOVO BLOCO DE ESTILO: CURSOR E ÁREA DE CLIQUE PARA ITENS DE FÓRMULA */
+.formula-item {
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+    /* CRÍTICO (1): Adiciona o cursor de ação (mãozinha) ao item pai */
+    cursor: pointer; 
+}
+.formula-item:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary);
+}
+.formula-item h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 5px;
+}
+.formula-item math-field[read-only] {
+    font-size: 1.1em;
+    padding: 0;
+    width: 100%;
+    
+    /* CORREÇÃO FINAL CRÍTICA: Neutraliza o comportamento de texto do MathLive */
+    /* Garante que o cursor do mouse não mude para text-bar */
+    cursor: pointer !important;
+    /* Impede que o componente MathLive capture o evento de clique */
+    pointer-events: none;
+    /* Remove a seleção de texto que pode estar causando a proteção de clique */
+    user-select: none;
+}
+
+
+/* Bloco 8: Estilos Rodapé Técnico e Resultado/Plotly */
 /* === RODAPÉ TÉCNICO (Códigos) === */
 .tech-footer {
     background: var(--bg-app); border: 1px solid var(--border); border-top: 1px solid var(--border);
@@ -401,11 +701,19 @@ math-field:focus, math-field:focus-within { outline: none; }
 /* === RESULTADO & GRÁFICO === */
 .result-card {
     background: var(--bg-card); border-radius: var(--radius); padding: 25px; border: 1px solid var(--border);
-    box-shadow: var(--shadow); border-left: 5px solid var(--primary); display: flex; flex-direction: column;
+    box-shadow: var(--shadow); border-left: 5px solid var(--primary); display: flex;
+    flex-direction: column;
+    /* REMOVEMOS MARGIN-TOP para controlar o espaçamento no fluxo */
 }
 .result-card.hidden { display: none; }
-.result-header { display: flex; justify-content: space-between; align-items: flex-start; }
-#result-output { font-size: 2.2rem; padding: 10px 0 20px 0; width: 100%; pointer-events: none; font-family: "KaTeX_Main", "Times New Roman", serif !important; }
+#result-output { 
+    font-size: 2.2rem; 
+    padding: 10px 0 20px 0; 
+    width: 100%; 
+    pointer-events: none; 
+    /* CRÍTICO: Garante que a saída use as fontes de renderização do MathLive/KaTeX */
+    font-family: 'KaTeX_Main', 'KaTeX_Math', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_Typewriter', serif !important; 
+}
 
 /* Container do Gráfico PLOTLY */
 #plot-container {
@@ -425,45 +733,368 @@ math-field:focus, math-field:focus-within { outline: none; }
 }
 
 
-/* === SIDEBAR (Conteúdo Interno) === */
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.sidebar-header h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
-.btn-text { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; text-decoration: underline; }
-.btn-text:hover { color: var(--primary); }
+/* Bloco 9: Estilos das Sidebars (Histórico e Memorial) */
+/* === SIDEBAR HISTÓRICO (Antigo Memória) === */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background: var(--bg-sidebar);
+    border-left: 1px solid var(--border);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    /* ALTERADO: Aumenta o Z-index para sobrepor o Memorial (1500) */
+    z-index: 1700; 
+    box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+    
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-.history-content { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
-.history-item { background: var(--bg-app); padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
-.history-item:hover { border-color: var(--primary); background: var(--bg-card); transform: translateX(-2px); }
-.history-result-group { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.history-item .delete-btn { font-size: 1.2em; color: var(--text-muted); cursor: pointer; padding: 2px; border-radius: 4px; transition: color 0.2s; }
-.history-item:hover .delete-btn { color: var(--danger); }
+.sidebar.open {
+    transform: translateX(0); 
+}
 
-.empty-state { text-align: center; color: var(--text-muted); font-style: italic; margin-top: 40px; }
-.sidebar-footer { margin-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.75rem; }
+/* NOVO: Estiliza o cabeçalho do Histórico para alinhamento horizontal */
+.sidebar-header {
+    display: flex;
+    /* Usa space-between para colocar o botão no canto direito */
+    justify-content: space-between; 
+    align-items: center;
+    padding: 0 0 15px 0; /* Ajustado padding */
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+.sidebar-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+/* Move o botão Limpar para o canto superior direito (já está dentro do header) */
+#clear-history-btn {
+    /* Reusando estilo de botão icon, mas garantindo que ele seja um alvo de clique */
+    width: 32px; /* Adicionado largura/altura para melhor hit area */
+    height: 32px;
+    padding: 5px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#clear-history-btn:hover {
+    color: var(--danger);
+    background-color: var(--danger-light);
+}
+
+.history-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px; /* Para melhor visualização da barra de rolagem */
+}
+.history-item {
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.history-item:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary);
+}
+.history-result-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.history-result-group .delete-btn {
+    font-size: 1rem;
+    color: var(--danger);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+.history-result-group .delete-btn:hover {
+    opacity: 1;
+}
 
 
+/* Bloco 10: Estilos do Memorial (Gaveta Esquerda) */
+/* === NOVO: TECLADO VIRTUAL FIXO === */
+#virtual-keyboard-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* Altura ajustável, mas 400px é um bom padrão */
+    max-height: 400px; 
+    background-color: var(--bg-card);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 3000; /* Z-Index 3000 para sobreposição garantida sobre o Memorial (1500) */
+    /* Inicia escondido abaixo da tela */
+    transform: translateY(100%); 
+    transition: transform 0.3s ease-out;
+}
+#virtual-keyboard-container.open {
+    transform: translateY(0);
+}
+/* Estilo para garantir que o teclado MathLive interno seja visível e preencha o container */
+#virtual-keyboard-container .mlp-virtual-keyboard {
+    height: 100% !important; 
+    width: 100% !important;
+    position: relative !important; 
+}
+/* CORREÇÃO: Esconde a toolbar/barra de atalhos interna do MathLive (garante que não haja a barra preta) */
+#virtual-keyboard-container .mlp-virtual-keyboard-toolbar {
+    display: none !important;
+}
+
+
+/* Bloco 11: Estilos dos Toggles Flutuantes (Mobile) */
+/* Botão Flutuante para ABRIR o Teclado */
+.btn-fixed-bottom {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px; /* Formato Pílula */
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2); /* Sombra ajustada */
+    font-size: 1rem;
+    font-weight: 600;
+    z-index: 9999; /* Z-INDEX MÁXIMO PARA GARANTIR VISIBILIDADE */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s, opacity 0.3s, bottom 0.3s;
+}
+.btn-fixed-bottom:hover { background-color: var(--primary-hover); }
+
+/* Esconde o botão flutuante quando o teclado está aberto */
+#keyboard-toggle.hidden {
+    opacity: 0;
+    pointer-events: none; /* Não clicável */
+    bottom: -50px; /* Move para fora da vista */
+}
+
+
+/* === SIDEBAR MEMORIAL (NOVO) - CORRIGIDO: Largura Fixa e Padding */
+.memorial-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 320px; /* Alterado de 100% para 320px (Largura da gaveta) */
+    height: 100vh;
+    background: var(--bg-sidebar);
+    padding: 0; /* Removido padding principal */
+    display: flex;
+    flex-direction: column;
+    z-index: 1500; 
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.memorial-sidebar.open {
+    transform: translateX(0); 
+}
+
+/* Estrutura interna para as abas */
+.library-master-tabs {
+    padding: 0 20px; /* Adiciona padding horizontal */
+    margin-top: 15px; /* Espaçamento do cabeçalho */
+}
+
+.library-content-scroll {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px 20px; /* Adiciona padding lateral e inferior */
+    
+}
+.library-detail-area {
+    width: 100%;
+    /* Desfaz o estilo do tab-content-area padrão para se adequar ao layout vertical da gaveta */
+    position: static; 
+    margin-top: 0;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0;
+    box-shadow: none;
+    z-index: 1; 
+}
+
+
+/* ======================================================= */
+/* Botão Memorial (Gaveta Esquerda) - Ajustado o left na abertura */
+/* ======================================================= */
+#memorial-toggle {
+    position: fixed;
+    top: 50%;
+    left: 30px; /* Posição ajustada */
+    transform: translateY(-50%); 
+    
+    width: 32px;
+    height: 130px; 
+    writing-mode: vertical-rl;
+    font-weight: 600;
+    font-size: 1.1rem;
+    
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    
+    cursor: pointer;
+    z-index: 1001; 
+    
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    justify-content: center;
+    gap: 5px; 
+    
+    color: var(--primary);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, width 0.2s;
+}
+
+#memorial-toggle:hover {
+    background: var(--bg-app);
+    width: 35px;
+}
+#memorial-toggle span {
+    font-size: 1.8rem;
+    /* CORREÇÃO: Gira a seta para apontar para a direita (sentido de abertura) */
+    transform: rotate(90deg); 
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Botão acompanha o Memorial quando abre (AGORA USANDO LARGURA FIXA 320PX) */
+.memorial-sidebar.open ~ #memorial-toggle {
+    left: 350px; /* 320px (Largura fixa) + 30px (padding/margem) */
+    transform: translateY(-50%) ; 
+}
+.memorial-sidebar.open ~ #memorial-toggle span {
+    transform: rotate(-90deg); /* Seta aponta para a esquerda (indicando fechar) */
+}
+
+
+/* Botão de Recolher Memorial (Canto Superior Direito da Gaveta) */
+#memorial-recolher {
+    /* Reusa estilos de btn-icon, mas posiciona-o */
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    z-index: 10;
+}
+
+/* Bloco 12: Media Queries (Responsividade) */
 /* === RESPONSIVIDADE === */
-@media (max-width: 900px) {
+
+/* REGRA GERAL PARA GARANTIR A ROLAGEM EM TODAS AS TELAS QUANDO O TECLADO ESTÁ ABERTO */
+body.keyboard-open .main-content {
+    /* Valor alto para compensar o teclado grande (Max-Height: 400px + 200px de folga de scroll) */
+    padding-bottom: 600px; 
+}
+
+
+/* --- ESTILOS DE TELA GRANDE (Widescreen > 1200px) --- */
+@media (min-width: 1201px) {
+    /* Estado padrão: Ambas as gavetas abertas */
+    .memorial-sidebar:not(.override-close) {
+        transform: translateX(0);
+    }
+    .sidebar:not(.override-close) {
+        transform: translateX(0);
+    }
+    
+    /* Desloca o conteúdo principal para o centro */
     .main-content {
-        padding: 20px;
-        padding-right: 40px; 
-    }
-    .sidebar { width: 85%; }
-    .sidebar.open ~ #sidebar-toggle { right: 85%; }
-    
-    /* Garante que o input e botões estiquem */
-    .input-group, .editor-actions { 
-        flex-direction: column; 
-        width: 100%; 
-        margin-top: 10px; 
-        align-items: stretch; 
+        padding-left: 350px; /* 320px (Memorial) + 30px (padding) */
+        padding-right: 350px; /* 320px (Histórico) + 30px (padding) */
+        /* Garante que o Histórico e o Memorial toggles fiquem escondidos */
+        z-index: 1; /* Abaixa o z-index do conteúdo principal */
     }
     
-    .btn-primary { width: 100%; } 
-    math-field { margin-right: 0; }
+    /* Esconde os botões de toggle quando as gavetas estão abertas por padrão */
+    #sidebar-toggle, #memorial-toggle {
+        display: none !important;
+    }
+}
+
+
+/* --- ESTILOS DE TELA MÉDIA (901px a 1200px) --- */
+@media (min-width: 901px) and (max-width: 1200px) {
+    /* Estado padrão: Histórico fechado, Memorial aberto */
+    .memorial-sidebar:not(.override-close) {
+        transform: translateX(0);
+    }
+    .sidebar {
+        transform: translateX(100%);
+    }
     
-    .toolbar-pane > div { gap: 2px; }
-    .toolbar-group { flex-wrap: wrap; justify-content: center; }
+    /* Desloca o conteúdo principal apenas pelo Memorial */
+    .main-content {
+        padding-left: 350px; /* 320px (Memorial) + 30px (padding) */
+        padding-right: 60px; /* Histórico fechado, usa padding normal */
+    }
     
-    .tech-content { grid-template-columns: 1fr; }
+    /* Toggle do Histórico visível; Toggle do Memorial escondido */
+    #sidebar-toggle {
+        display: flex !important;
+        right: 30px; /* Posição normal */
+    }
+    #memorial-toggle {
+        display: none !important;
+    }
+}
+
+
+/* --- ESTILOS DE TELA PEQUENA (<= 900px) --- */
+@media (max-width: 900px) {
+    /* ... (Estilos de responsividade existentes para mobile/tablet) ... */
+    .tab-handle {
+        width: 120px;
+        height: 35px;
+    }
+    .tab-handle.active {
+        height: 34px;
+    }
+    
+    /* Garante que os toggles laterais sejam reposicionados */
+    .main-content {
+        padding-right: 15px; /* Ajusta padding para mobile */
+        padding-left: 15px; 
+    }
+    #sidebar-toggle {
+        right: 15px; /* Ajusta para o padding de 15px do main-content */
+        display: flex !important; /* Visível por padrão */
+    }
+    .sidebar.open ~ #sidebar-toggle {
+        right: 335px; /* 320px (sidebar) + 15px (novo padding) */
+    }
+    
+    #memorial-toggle {
+        left: 15px; /* Ajusta para o padding de 15px do main-content */
+        z-index: 1600; 
+        display: flex !important; /* Visível por padrão */
+    }
+    .memorial-sidebar.open ~ #memorial-toggle {
+        left: 335px; /* 320px (Largura fixa) + 15px (novo padding) */
+    }
 }
