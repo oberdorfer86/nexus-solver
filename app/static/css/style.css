@@ -234,11 +234,11 @@ html { font-size: 15px; }
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, width 0.2s;
 }
 #nexus-toggle:hover { background: var(--bg-app); width: 35px; }
-#nexus-toggle span { font-size: 1.4rem; transform: rotate(90deg); transition: transform 0.3s ease-in-out; }
+#nexus-toggle span { font-size: 1.4rem; transform: rotate(-90deg); transition: transform 0.3s ease-in-out; }
 
 /* Move toggle quando o painel NEXUS abrir */
 .sidebar.left.open ~ #nexus-toggle { left: 350px; }
-.sidebar.left.open ~ #nexus-toggle span { transform: rotate(-90deg); }
+.sidebar.left.open ~ #nexus-toggle span { transform: rotate(90deg); }
 
 /* NOVO: Classe para ocultar os toggles em mobile quando o teclado ou outra gaveta está aberta */
 /* Também esconde os toggles por padrão em desktop, confiando no JS para mostrá-los/escondê-los */
@@ -374,8 +374,8 @@ html { font-size: 15px; }
     /* Keep active/inactive box model identical to avoid layout shift */
     margin-top: 0;
     height: 36px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 1px;
+    padding-right: 1px;
     /* Use a subtle inner highlight instead of changing size */
     box-shadow: inset 0 -3px 0 0 rgba(59,130,246,0.08);
 }
@@ -431,7 +431,7 @@ html { font-size: 15px; }
     display: block !important; 
     padding-top: 0;
     /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
-    padding: 0 20px 20px 20px; 
+    padding: 0 2px 2px 2px; 
 }
     /* By default category panes are hidden; JS will show the selected category pane */
     #toolbar-content-area .toolbar-pane, #formula-content-area .formula-pane {
@@ -454,9 +454,9 @@ html { font-size: 15px; }
     /* Category navigation (level-2 titles transformed into tabs) */
     .category-nav {
         display: flex;
-        gap: 8px;
+        gap: 1px;
         align-items: center;
-        padding: 8px 4px;
+        padding: 4px 3px;
         overflow-x: auto;
         margin-bottom: 12px;
     }
@@ -528,7 +528,7 @@ html { font-size: 15px; }
     display: block !important;
     margin-top: 0;
     /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
-    padding: 0 20px 20px 20px; 
+    padding: 0 2px 2px 2px; 
 }
 
 
@@ -879,8 +879,8 @@ math-field:focus, math-field:focus-within { outline: none; }
 
 /* Força botões a manterem dimensões consistentes para formar duas linhas visuais */
 .toolbar-group .toolbar-btn {
-    flex: 0 0 50px; /* REDUÇÃO: de 56px para 50px */
-    height: 50px; /* REDUÇÃO: de 56px para 50px */
+    flex: 0 0 44px; /* REDUÇÃO: de 56px para 50px */
+    height: 44px; /* REDUÇÃO: de 56px para 50px */
     display: inline-flex !important;
     align-items: center;
     justify-content: center;

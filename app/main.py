@@ -157,7 +157,7 @@ def handle_calculus_commands(expr_str, local_dict=None):
     return None
 
 # Bloco 5: API Endpoint para Cálculo (Lógica Principal)
-@app.post("/api/calzzzzculate")
+@app.post("/api/calculate")
 async def handle_calculate(request: CalculationRequest):
     # LOG CRÍTICO 1: Exibir dados brutos da requisição
     print(f"--- Cálculo Recebido ---")
