@@ -41,18 +41,54 @@ window.onload = function() {
     const toolbarContentArea = getEl('toolbar-content-area');
     const formulaContentArea = getEl('formula-content-area');
     
-    // Elementos da Sidebar
+    // Elementos da Sidebar (Histórico - Direita)
     const sidebar = getEl('app-sidebar');
     const sidebarToggle = getEl('sidebar-toggle');
+    
+    // Elementos NEXUS (novo sidebar esquerdo)
+    const nexusSidebar = getEl('app-nexus');
+    const nexusToggle = getEl('nexus-toggle');
 
-    // Elementos do Memorial 
-    const memorialSidebar = getEl('app-memorial');
-    const memorialToggle = getEl('memorial-toggle');
-    const memorialRecolher = getEl('memorial-recolher'); 
+    // Elementos da Library (Antigo Memorial, agora fixo no topo)
+    const libraryContainer = getEl('app-library');
+    // const memorialToggle - REMOVIDO
+    // const memorialRecolher - REMOVIDO
     
     // NOVO: Adiciona o botão Limpar Histórico para ser excluído na lógica de clique fora
     const clearHistBtn = getEl('clear-history-btn');
+    
+    // NOVO: Adiciona a referência do container principal
+    const mainContent = document.querySelector('.main-content');
+    
+    // CRÍTICO: Força a rolagem para o topo na inicialização para garantir a visibilidade do cabeçalho
+    if (mainContent) {
+        setTimeout(() => {
+            mainContent.scrollTop = 0;
+        }, 50); // Delay para garantir que o layout final tenha sido renderizado
+    }
 
+// Ensure .formula-item overlays exist and math-field internals are non-focusable
+function ensureFormulaOverlaysGlobal() {
+    document.querySelectorAll('.formula-item').forEach(item => {
+        const mfChild = item.querySelector('math-field');
+        if (mfChild) {
+            try { mfChild.setAttribute('tabindex', '-1'); } catch (e) {}
+            try { mfChild.setAttribute('aria-hidden', 'true'); } catch (e) {}
+            try { mfChild.style.pointerEvents = 'none'; } catch (e) {}
+        }
+
+        if (!item.querySelector('.formula-overlay')) {
+            const ov = document.createElement('div');
+            ov.className = 'formula-overlay';
+            item.appendChild(ov);
+        }
+    });
+}
+
+    
+
+// ===============================================================================================//
+// ===============================================================================================//    
 // Bloco 2: Lógica de Botões de Cálculo (HTML States)
     const CALCULATE_NORMAL_HTML = `<span class="material-icons-round calculate-icon">calculate</span> Calcular`;
     const CALCULATE_LOADING_HTML = `<span class="material-icons-round loading-icon">autorenew</span> Calculando...`;
@@ -63,62 +99,115 @@ window.onload = function() {
         calculateBtn.classList.remove('loading');
     }
 
-// Bloco 3: Lógica do Teclado Virtual (Toggle Keyboard)
-    const keyboardContainer = getEl('virtual-keyboard-container');
-    const keyboardToggleBtn = getEl('keyboard-toggle'); // Botão flutuante (ABRIR)
 
-    function toggleKeyboard(open) {
-        if (!keyboardContainer || !keyboardToggleBtn || !mf || !sidebarToggle || !memorialToggle) return; 
-        
-        const isOpen = open !== undefined ? open : !keyboardContainer.classList.contains('open');
+
+// ===============================================================================================//
+// ===============================================================================================//    
+// Bloco 3: Lógica do Teclado Virtual (Toggle Keyboard)
+const keyboardContainer = getEl('virtual-keyboard-container');
+const keyboardToggleBtn = getEl('keyboard-toggle'); // Botão flutuante (ABRIR)
+
+function _safeAddClass(el, cls){ if(el && !el.classList.contains(cls)) el.classList.add(cls); }
+function _safeRemoveClass(el, cls){ if(el && el.classList.contains(cls)) el.classList.remove(cls); }
+
+function toggleKeyboard(open) {
+    try {
+        if (!keyboardContainer || !keyboardToggleBtn || !mf) return;
+        const wasOpen = keyboardContainer.classList.contains('open');
+        const isOpen = open !== undefined ? !!open : !wasOpen;
+
+        // Idempotência: se estado já for o desejado, garante efeitos colaterais mínimos e retorna.
+        if (isOpen === wasOpen) {
+            // porém, garante que o botão esteja com visibilidade coerente
+            if (isOpen) _safeAddClass(keyboardToggleBtn, 'hidden');
+            else _safeRemoveClass(keyboardToggleBtn, 'hidden');
+            return;
+        }
 
         if (isOpen) {
-            
-            // CORREÇÃO CRÍTICA (1): Move a lógica de ocultar toggles laterais para o teclado ABRIR
+            // Abrindo teclado
+            _safeAddClass(keyboardToggleBtn, 'hidden'); // ESCONDE o botão flutuante do teclado
+            // Em mobile apenas: oculta toggles laterais para foco
             if (window.innerWidth <= MOBILE_BREAKPOINT) {
-                 sidebarToggle.classList.add('hidden');
-                 memorialToggle.classList.add('hidden');
+                if (sidebarToggle) _safeAddClass(sidebarToggle, 'hidden');
+                if (nexusToggle) _safeAddClass(nexusToggle, 'hidden');
             }
-            
-            mf.executeCommand('showVirtualKeyboard');
-            keyboardContainer.classList.add('open');
-            keyboardToggleBtn.classList.add('hidden'); // ESCONDE O BOTão FLUTUANTE
-            
-            body.classList.add('keyboard-open');
-            mf.focus();
-            
-        } else {
-            mf.executeCommand('hideVirtualKeyboard'); 
-            keyboardContainer.classList.remove('open');
-            
-            // CORREÇÃO CRÍTICA (2): Reabilita o botão flutuante APENAS se NENHUM painel lateral estiver aberto E NÃO for tela grande.
-            // O botão Teclado deve reaparecer se a gaveta do teclado fechar, a menos que estejamos em uma tela onde ele está permanentemente escondido pelo CSS/JS de responsividade.
-            if (window.innerWidth <= LARGE_SCREEN_BREAKPOINT && !sidebar.classList.contains('open') && !memorialSidebar.classList.contains('open')) {
-                // Adicionamos um pequeno timeout para evitar a reabertura imediata no Mac (bug de foco)
-                setTimeout(() => {
-                    keyboardToggleBtn.classList.remove('hidden'); 
-                }, 100);
-            }
-            
-            // Reabilita os botões laterais em mobile se o teclado fechar
+            // Em mobile: fecha ambas as gavetas para dar prioridade ao teclado
             if (window.innerWidth <= MOBILE_BREAKPOINT) {
-                // Apenas reabilita se o CSS não os escondeu completamente por breakpoint
-                if (!sidebar.classList.contains('open')) sidebarToggle.classList.remove('hidden');
-                if (!memorialSidebar.classList.contains('open')) memorialToggle.classList.remove('hidden'); 
+                try {
+                    if (sidebar && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        _safeRemoveClass(document.body, 'sidebar-visible');
+                    }
+                } catch(e) { /* ignore */ }
+                try {
+                    if (nexusSidebar && nexusSidebar.classList.contains('open')) {
+                        nexusSidebar.classList.remove('open');
+                        _safeRemoveClass(document.body, 'nexus-visible');
+                    }
+                } catch(e) { /* ignore */ }
             }
-            body.classList.remove('keyboard-open');
-        }
-    }
+            // Abre o teclado virtual pelo MathLive
+            try { mf.executeCommand && mf.executeCommand('showVirtualKeyboard'); } catch(e){ /* ignore */ }
+            _safeAddClass(keyboardContainer, 'open');
+            _safeAddClass(body, 'keyboard-open');
 
-    if (keyboardToggleBtn) {
-        keyboardToggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Garante que o clique para abrir o teclado sempre force a abertura
-            toggleKeyboard(true); 
-        });
-        // Garante que o botão esteja visível na inicialização (será controlado pela lógica responsiva)
-        keyboardToggleBtn.classList.remove('hidden');
+            // Força foco com pequeno delay para evitar conflitos de render
+            setTimeout(() => { try { mf.focus(); } catch(e){} }, 80);
+
+            // Ajuste de padding/scroll para evitar sobreposição do teclado
+            setTimeout(() => {
+                try {
+                    const kbRect = keyboardContainer.getBoundingClientRect();
+                    const kbHeight = (kbRect && kbRect.height) ? kbRect.height : 400;
+                    const main = document.querySelector('.main-content');
+                    const unified = document.querySelector('.unified-input-wrapper');
+                    if (main) main.style.paddingBottom = (kbHeight + 120) + 'px';
+                    if (unified) {
+                        const uRect = unified.getBoundingClientRect();
+                        const overlap = (uRect.bottom) - (window.innerHeight - kbHeight);
+                        if (overlap > 0) window.scrollBy({ top: overlap + 12, behavior: 'smooth' });
+                    }
+                } catch (e) { console.warn('keyboard layout adjust failed', e); }
+            }, 120);
+
+        } else {
+            // Fechando teclado
+            try { mf.executeCommand && mf.executeCommand('hideVirtualKeyboard'); } catch(e){ /* ignore */ }
+            _safeRemoveClass(keyboardContainer, 'open');
+
+            // Pequeno timeout para evitar problemas de foco/bug no Mac
+            setTimeout(() => { try { _safeRemoveClass(keyboardToggleBtn, 'hidden'); } catch(e){} }, 100);
+
+            // Em mobile: reabilita toggles somente se o breakpoint permitir e se respectivas sidebars não estiverem abertas
+            if (window.innerWidth <= MOBILE_BREAKPOINT) {
+                if (sidebar && !sidebar.classList.contains('open')) _safeRemoveClass(sidebarToggle, 'hidden');
+                if (nexusSidebar && !nexusSidebar.classList.contains('open') && nexusToggle) _safeRemoveClass(nexusToggle, 'hidden');
+            }
+
+            _safeRemoveClass(body, 'keyboard-open');
+
+            // Reset paddingBottom adicionado ao abrir teclado
+            try { const main = document.querySelector('.main-content'); if (main) main.style.paddingBottom = ''; } catch(e){}
+        }
+    } catch (err) {
+        console.error('toggleKeyboard error', err);
     }
+}
+
+if (keyboardToggleBtn) {
+    keyboardToggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Sempre forçar abertura ao clicar (conforme UX definido)
+        toggleKeyboard(true);
+    });
+    // Garantir visibilidade inicial coerente (applyResponsiveVisibility controla a visibilidade definitiva)
+    _safeRemoveClass(keyboardToggleBtn, 'hidden');
+}
+
+
+
 
 // Bloco 4: Lógica de Alternância Principal (Master Tabs)
     const panelTitle = document.querySelector('.app-header h1'); 
@@ -144,6 +233,24 @@ window.onload = function() {
             
             // O botão do teclado permanece visível (se o teclado estiver fechado)
             if (!keyboardContainer.classList.contains('open')) keyboardToggleBtn.classList.remove('hidden');
+
+            // Mostrar/ocultar navs de categoria conforme a aba ativa
+            try {
+                const toolbarNav = document.querySelector('#toolbar-content-area .category-nav');
+                const formulaNav = document.querySelector('#formula-content-area .category-nav');
+                if (formulaNav) formulaNav.style.display = 'flex';
+                if (toolbarNav) toolbarNav.style.display = 'none';
+            } catch(e) { /* ignore */ }
+            // CRÍTICO: Ativa o primeiro painel e botão de categoria de Fórmulas após a ativação da aba principal
+            try {
+                const nav = document.querySelector('#formula-content-area .category-nav');
+                if (nav) {
+                    const firstBtn = nav.querySelector('.cat-btn:first-child');
+                    if (firstBtn) firstBtn.click(); // Simula o clique para ativar o painel
+                    // Ensure overlays are present after panes activate
+                    setTimeout(ensureFormulaOverlaysGlobal, 80);
+                }
+            } catch(e) { /* ignore */ }
             
         } else {
             // Ativa Funções
@@ -162,8 +269,37 @@ window.onload = function() {
             // Mostra o botão do teclado
             if (!keyboardContainer.classList.contains('open')) keyboardToggleBtn.classList.remove('hidden'); 
             mf.focus();
+
+            // Mostrar/ocultar navs de categoria conforme a aba ativa
+            try {
+                const toolbarNav = document.querySelector('#toolbar-content-area .category-nav');
+                const formulaNav = document.querySelector('#formula-content-area .category-nav');
+                if (toolbarNav) toolbarNav.style.display = 'flex';
+                if (formulaNav) formulaNav.style.display = 'none';
+            } catch(e) { /* ignore */ }
+            // Garantir que nenhum painel de fórmula permaneça marcado como ativo
+            try {
+                document.querySelectorAll('.formula-pane.active').forEach(p => p.classList.remove('active'));
+            } catch(e) { /* ignore */ }
+            // Força remoção de qualquer painel de fórmulas ativo (garante ocultação completa)
+            try {
+                document.querySelectorAll('#formula-content-area .formula-pane').forEach(p => {
+                    p.classList.remove('active');
+                    p.style.display = 'none';
+                });
+            } catch(e) { /* ignore */ }
+            // Também garante que os botões de categoria das fórmulas não permaneçam visualmente ativos
+            try {
+                document.querySelectorAll('#formula-content-area .cat-btn.active').forEach(b => b.classList.remove('active'));
+            } catch(e) { /* ignore */ }
+        }
+        
+        // CRÍTICO: Após a troca de aba e foco, force o scroll para o topo
+        if (mainContent) {
+             mainContent.scrollTop = 0;
         }
     }
+
 
     // 2. Listeners para os Handles e Botões Internos
     if (toolbarHandle) {
@@ -185,89 +321,449 @@ window.onload = function() {
         });
     }
     
-    // Inicializa o estado: Funções (false)
-    toggleMainContent(false); 
+    // (Inicialização da aba principal será feita após construir as navs de categoria)
+
+    // --- Build horizontal category nav (level-2 titles) for toolbar (Funções) and formulas ---
+    function setupCategoryNavFor(contentRootSelector, sectionTitleSelector) {
+        const container = document.querySelector(contentRootSelector);
+        if (!container) return;
+
+        // The content area may wrap inner content in a .toolbar-content or .formula-content-details
+        const inner = container.querySelector('.toolbar-content') || container.querySelector('.formula-content-details') || container;
+        if (!inner) return;
+
+        const titles = Array.from(inner.querySelectorAll(sectionTitleSelector));
+        if (titles.length === 0) return;
+
+        const nav = document.createElement('div');
+        nav.className = 'category-nav';
+
+        // CORREÇÃO CRÍTICA: Os painéis são agora referenciados pelo seu ID
+        const panes = [];
+        // decide expected pane class based on content root
+        const expectedPaneClass = contentRootSelector.includes('formula') ? 'formula-pane' : 'toolbar-pane';
+
+        titles.forEach((title, idx) => {
+            let pane = title.nextElementSibling;
+            
+            // Se next sibling é um divisor, ignoramos e removemos, e pegamos o próximo elemento que deve ser o painel
+            if (pane && pane.classList.contains('divider')) {
+                const toRemove = pane;
+                pane = pane.nextElementSibling;
+                try { toRemove.parentNode.removeChild(toRemove); } catch(e){}
+            }
+            
+            // Garante que é um painel válido antes de prosseguir
+            if (!pane || !pane.classList.contains(expectedPaneClass)) return;
+            
+            // Garante que o painel tem ID para referência
+            if (!pane.id) {
+                pane.id = `temp-pane-${idx}`;
+            }
+            panes.push(pane);
+
+            // Hide original title
+            title.style.display = 'none';
+
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.type = 'button';
+            btn.textContent = title.textContent.trim();
+            btn.dataset.paneId = pane.id; // Salva o ID do painel no botão
+            
+            // Adiciona listener para controle de visibilidade
+            btn.addEventListener('click', () => {
+                // Desativa todos os botões e painéis
+                nav.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                
+                // Oculta todos os painéis removendo a classe CSS 'active'
+                panes.forEach(p => p.classList.remove('active')); 
+                
+                // Ativa o botão e o painel correspondente
+                btn.classList.add('active');
+                // CRÍTICO: Adiciona a classe 'active' para que o CSS (display: flex) seja aplicado
+                pane.classList.add('active');
+            });
+
+            nav.appendChild(btn);
+        });
+
+        // Insere nav antes do primeiro título, se houver painéis válidos
+        if (titles.length > 0) {
+            const firstTitle = titles[0];
+            // CORREÇÃO CRÍTICA: Insere a navegação ANTES do primeiro título encontrado,
+            // garantindo que ela fique dentro do container interno (`.toolbar-content` ou `.formula-content-details`).
+            // Isso respeita o escopo e é o método mais seguro de inserção no DOM.
+            firstTitle.parentNode.insertBefore(nav, firstTitle); 
+        }
+
+        // Ativa o primeiro painel por padrão e garante que todos os outros estejam ocultos
+        panes.forEach((p, i) => {
+            if (i === 0) {
+                // O primeiro painel já deve ter 'active' no HTML para carregamento inicial (agora adicionamos aqui, caso falhe no HTML)
+                p.classList.add('active'); 
+            } else {
+                // Remove a classe 'active' dos demais para que o CSS (display: none) funcione
+                p.classList.remove('active');
+            }
+        });
+        
+        const firstBtn = nav.querySelector('.cat-btn');
+        if (firstBtn) firstBtn.classList.add('active'); // Ativa visualmente o primeiro botão
+
+    }
+
+    // Setup for functions and formulas
+    setupCategoryNavFor('#toolbar-content-area', '.toolbar-section-title');
+    setupCategoryNavFor('#formula-content-area', '.toolbar-section-title');
+
+    // Ajusta a largura de cada grupo com base no número de botões
+    function adjustToolbarGroupWidths() {
+        // botão base tamanho (px) - corresponde ao CSS: flex basis 56px / 48px for formulas
+        const defaultBtnSize = 50; // AJUSTADO para 50px
+        const formulaBtnSize = 48;
+        const defaultGap = 8;
+
+        const processGroup = (group, isFormula) => {
+            const allBtns = Array.from(group.querySelectorAll('.toolbar-btn'));
+            // ignore hidden placeholders
+            const visibleBtns = allBtns.filter(b => !(b.style && b.style.visibility === 'hidden'));
+            const n = visibleBtns.length;
+            if (n === 0) {
+                group.style.width = 'auto';
+                group.style.height = 'auto';
+                group.style.flex = '0 0 auto';
+                return;
+            }
+
+            const btnSize = isFormula ? formulaBtnSize : defaultBtnSize;
+            // columns = ceil(n/2) ensures first row gets ceil(n/2)
+            const columns = Math.ceil(n / 2);
+            const gap = defaultGap; // gap between buttons
+            const widthPx = columns * btnSize + (columns - 1) * gap;
+            // height for two rows (btn height + gap + btn height)
+            const heightPx = (btnSize * 2) + gap;
+
+            // Use CSS Grid per-group to reliably force exact two-line layout
+            group.style.width = widthPx + 'px';
+            group.style.height = heightPx + 'px';
+            group.style.flex = '0 0 auto';
+            group.style.display = 'grid';
+            group.style.gridTemplateColumns = `repeat(${columns}, ${btnSize}px)`;
+            group.style.gridAutoRows = `${btnSize}px`;
+            group.style.columnGap = gap + 'px';
+            group.style.rowGap = gap + 'px';
+            group.style.alignItems = 'start';
+        };
+
+        // toolbar groups in both toolbar and formula areas
+        document.querySelectorAll('#toolbar-content-area .toolbar-group').forEach(g => processGroup(g, false));
+        document.querySelectorAll('#formula-content-area .toolbar-group').forEach(g => processGroup(g, true));
+    }
+
+    // Run initially and on resize (debounced)
+    adjustToolbarGroupWidths();
+    let resizeTimer = null;
+    window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { adjustToolbarGroupWidths(); }, 120); });
+
+    // Agora que as navs foram construídas e panes potencialmente realocados,
+    // inicializamos o estado da aba principal para Funções e ajustamos a visibilidade das navs.
+    try {
+        // Inicialmente: Funções visível, Fórmulas oculto
+        toggleMainContent(false);
+        // Ensure overlays are present even when formulas hidden (pre-inject)
+        try { ensureFormulaOverlaysGlobal(); } catch(e) {}
+        const toolbarNav = document.querySelector('#toolbar-content-area .category-nav');
+        const formulaNav = document.querySelector('#formula-content-area .category-nav');
+        if (toolbarNav) toolbarNav.style.display = 'flex';
+        if (formulaNav) formulaNav.style.display = 'none';
+    } catch(e) { /* ignore */ }
+
+  
     
 // Bloco 5: Lógica de Toggles de Sidebar (Histórico e Memorial)
-    // --- LÓGICA DA SIDEBAR DESLIZANTE (HISTÓRICO) ---
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', () => {
-            const willOpen = !sidebar.classList.contains('open');
-            sidebar.classList.toggle('open'); 
-            sidebar.classList.remove('override-close'); // Remove override se usado
-            
-            // Garante que a outra gaveta e o teclado fechem ao abrir esta
-            if (willOpen) {
-                 memorialSidebar.classList.remove('open');
-                 toggleKeyboard(false); 
-            } 
-            
-            if (window.innerWidth <= MOBILE_BREAKPOINT) {
-                if (willOpen) {
-                    // Histórico vai abrir -> Oculta Teclado e Memorial Toggle
-                    keyboardToggleBtn.classList.add('hidden');
-                    memorialToggle.classList.add('hidden');
-                } else {
-                    // Histórico vai fechar -> Re-habilita Teclado e Memorial Toggle (se o memorial não estiver aberto)
-                    if (!memorialSidebar.classList.contains('open')) {
-                        keyboardToggleBtn.classList.remove('hidden');
-                        memorialToggle.classList.remove('hidden');
-                    }
-                }
-            }
-        });
-    }
+if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Em desktop (large) não permitir toggle (sidebars fixas)
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) return;
 
-    // --- LÓGICA DA SIDEBAR MEMORIAL (NOVO) ---
-    if (memorialToggle && memorialSidebar) {
-        memorialToggle.addEventListener('click', () => {
-            const willOpen = !memorialSidebar.classList.contains('open');
-            memorialSidebar.classList.toggle('open');
-            memorialSidebar.classList.remove('override-close'); // Remove override se usado
-            
-            // Garante que a outra gaveta e o teclado fechem ao abrir esta
-            if (willOpen) {
-                 sidebar.classList.remove('open');
-                 toggleKeyboard(false); 
-            } 
-            
-            if (window.innerWidth <= MOBILE_BREAKPOINT) {
-                if (willOpen) {
-                    // Memorial vai abrir -> Oculta Teclado e Histórico Toggle
-                    keyboardToggleBtn.classList.add('hidden'); 
-                    sidebarToggle.classList.add('hidden');
-                } else {
-                    // Memorial vai fechar -> Re-habilita Teclado e Histórico Toggle (se o histórico não estiver aberto)
-                    if (!sidebar.classList.contains('open')) {
-                        keyboardToggleBtn.classList.remove('hidden');
-                        sidebarToggle.classList.remove('hidden');
-                    }
-                }
-            }
-        });
-    }
+        const willOpen = !sidebar.classList.contains('open');
 
-    // Listener do novo botão de recolher (Botão de 'x' no Memorial)
-    if (memorialRecolher) {
-        memorialRecolher.addEventListener('click', () => {
-            memorialSidebar.classList.remove('open');
-            
-            if (window.innerWidth <= MOBILE_BREAKPOINT) {
-                // Ao fechar Memorial, se Histórico não estiver aberto, re-habilita Toggles
-                if (!sidebar.classList.contains('open') && !keyboardContainer.classList.contains('open')) {
-                    sidebarToggle.classList.remove('hidden');
-                    keyboardToggleBtn.classList.remove('hidden');
-                }
+        // Fecha outras gavetas ao abrir (comportamento overlay/mobile)
+        if (willOpen) {
+            // Fecha Nexus se estiver aberto (evita overlap)
+            if (nexusSidebar && nexusSidebar.classList.contains('open')) {
+                nexusSidebar.classList.remove('open');
+                _safeRemoveClass(document.body, 'nexus-visible');
             }
-        });
-    }
+            // Fecha teclado se estiver aberto
+            toggleKeyboard(false);
+        }
 
+        // Toggle da sidebar
+        sidebar.classList.toggle('open');
+        sidebar.classList.remove('override-close');
+
+        // Mobile specific: quando abrir Histórico, esconder o toggle NEXUS para evitar duplicação visual
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            if (sidebar.classList.contains('open')) {
+                if (nexusToggle) _safeAddClass(nexusToggle, 'hidden');
+            } else {
+                if (nexusToggle && !(nexusSidebar && nexusSidebar.classList.contains('open'))) _safeRemoveClass(nexusToggle, 'hidden');
+            }
+        }
+
+        // Atualiza classes no body para o CSS reagir
+        if (window.innerWidth > MOBILE_BREAKPOINT) {
+            if (sidebar.classList.contains('open')) _safeAddClass(document.body, 'sidebar-visible');
+            else _safeRemoveClass(document.body, 'sidebar-visible');
+        } else {
+            // mobile: body class removida para evitar conflito com overlay logic
+            _safeRemoveClass(document.body, 'sidebar-visible');
+        }
+    });
+}
+
+if (nexusToggle && nexusSidebar) {
+    nexusToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Em desktop (large) não permitir toggle - as colunas permanecem fixas
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) return;
+
+        const willOpen = !nexusSidebar.classList.contains('open');
+
+        // Fecha a outra gaveta quando abrir (evita overlap)
+        if (willOpen) {
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                _safeRemoveClass(document.body, 'sidebar-visible');
+            }
+            // Fecha teclado se estiver aberto
+            toggleKeyboard(false);
+        }
+
+        nexusSidebar.classList.toggle('open');
+        nexusSidebar.classList.remove('override-close');
+
+        // Mobile: esconde toggle Histórico quando Nexus abrir como overlay
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            if (nexusSidebar.classList.contains('open')) {
+                if (sidebarToggle) _safeAddClass(sidebarToggle, 'hidden');
+            } else {
+                if (sidebarToggle && !(sidebar && sidebar.classList.contains('open'))) _safeRemoveClass(sidebarToggle, 'hidden');
+            }
+        }
+
+        // Atualiza body class para comportamento não-overlay em tamanhos médios (tablet scenario)
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) {
+            document.body.classList.toggle('nexus-visible', nexusSidebar.classList.contains('open'));
+        } else {
+            _safeRemoveClass(document.body, 'nexus-visible');
+        }
+    });
+}
+
+  
+    
+// Bloco 5: Lógica de Toggles de Sidebar (Histórico e Memorial)
+if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Em desktop (large) não permitir toggle (sidebars fixas)
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) return;
+
+        const willOpen = !sidebar.classList.contains('open');
+
+        // Fecha outras gavetas ao abrir (comportamento overlay/mobile)
+        if (willOpen) {
+            // Fecha Nexus se estiver aberto (evita overlap)
+            if (nexusSidebar && nexusSidebar.classList.contains('open')) {
+                nexusSidebar.classList.remove('open');
+                _safeRemoveClass(document.body, 'nexus-visible');
+            }
+            // Fecha teclado se estiver aberto
+            toggleKeyboard(false);
+        }
+
+        // Toggle da sidebar
+        sidebar.classList.toggle('open');
+        sidebar.classList.remove('override-close');
+
+        // Mobile specific: quando abrir Histórico, esconder o toggle NEXUS para evitar duplicação visual
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            if (sidebar.classList.contains('open')) {
+                if (nexusToggle) _safeAddClass(nexusToggle, 'hidden');
+            } else {
+                if (nexusToggle && !(nexusSidebar && nexusSidebar.classList.contains('open'))) _safeRemoveClass(nexusToggle, 'hidden');
+            }
+        }
+
+        // Atualiza classes no body para o CSS reagir
+        if (window.innerWidth > MOBILE_BREAKPOINT) {
+            if (sidebar.classList.contains('open')) _safeAddClass(document.body, 'sidebar-visible');
+            else _safeRemoveClass(document.body, 'sidebar-visible');
+        } else {
+            // mobile: body class removida para evitar conflito com overlay logic
+            _safeRemoveClass(document.body, 'sidebar-visible');
+        }
+    });
+}
+
+if (nexusToggle && nexusSidebar) {
+    nexusToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Em desktop (large) não permitir toggle - as colunas permanecem fixas
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) return;
+
+        const willOpen = !nexusSidebar.classList.contains('open');
+
+        // Fecha a outra gaveta quando abrir (evita overlap)
+        if (willOpen) {
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                _safeRemoveClass(document.body, 'sidebar-visible');
+            }
+            // Fecha teclado se estiver aberto
+            toggleKeyboard(false);
+        }
+
+        nexusSidebar.classList.toggle('open');
+        nexusSidebar.classList.remove('override-close');
+
+        // Mobile: esconde toggle Histórico quando Nexus abrir como overlay
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            if (nexusSidebar.classList.contains('open')) {
+                if (sidebarToggle) _safeAddClass(sidebarToggle, 'hidden');
+            } else {
+                if (sidebarToggle && !(sidebar && sidebar.classList.contains('open'))) _safeRemoveClass(sidebarToggle, 'hidden');
+            }
+        }
+
+        // Atualiza body class para comportamento não-overlay em tamanhos médios (tablet scenario)
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) {
+            document.body.classList.toggle('nexus-visible', nexusSidebar.classList.contains('open'));
+        } else {
+            _safeRemoveClass(document.body, 'nexus-visible');
+        }
+    });
+}
+
+  
+
+// ===============================================================================================//
+// ===============================================================================================//   
+// Bloco 5: Lógica de Toggles de Sidebar (Histórico e Memorial)
+if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Em desktop (large) não permitir toggle (sidebars fixas)
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) return;
+
+        const willOpen = !sidebar.classList.contains('open');
+
+        // Fecha outras gavetas ao abrir (comportamento overlay/mobile)
+        if (willOpen) {
+            // Fecha Nexus se estiver aberto (evita overlap)
+            if (nexusSidebar && nexusSidebar.classList.contains('open')) {
+                nexusSidebar.classList.remove('open');
+                _safeRemoveClass(document.body, 'nexus-visible');
+            }
+            // Fecha teclado se estiver aberto
+            toggleKeyboard(false);
+        }
+
+        // Toggle da sidebar
+        sidebar.classList.toggle('open');
+        sidebar.classList.remove('override-close');
+
+        // Mobile specific: quando abrir Histórico, esconder o toggle NEXUS para evitar duplicação visual
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            if (sidebar.classList.contains('open')) {
+                if (nexusToggle) _safeAddClass(nexusToggle, 'hidden');
+            } else {
+                if (nexusToggle && !(nexusSidebar && nexusSidebar.classList.contains('open'))) _safeRemoveClass(nexusToggle, 'hidden');
+            }
+        }
+
+        // Atualiza classes no body para o CSS reagir
+        if (window.innerWidth > MOBILE_BREAKPOINT) {
+            if (sidebar.classList.contains('open')) _safeAddClass(document.body, 'sidebar-visible');
+            else _safeRemoveClass(document.body, 'sidebar-visible');
+        } else {
+            // mobile: body class removida para evitar conflito com overlay logic
+            _safeRemoveClass(document.body, 'sidebar-visible');
+        }
+    });
+}
+
+if (nexusToggle && nexusSidebar) {
+    nexusToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Em desktop (large) não permitir toggle - as colunas permanecem fixas
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) return;
+
+        const willOpen = !nexusSidebar.classList.contains('open');
+
+        // Fecha a outra gaveta quando abrir (evita overlap)
+        if (willOpen) {
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                _safeRemoveClass(document.body, 'sidebar-visible');
+            }
+            // Fecha teclado se estiver aberto
+            toggleKeyboard(false);
+        }
+
+        nexusSidebar.classList.toggle('open');
+        nexusSidebar.classList.remove('override-close');
+
+        // Mobile: esconde toggle Histórico quando Nexus abrir como overlay
+        if (window.innerWidth <= MOBILE_BREAKPOINT) {
+            if (nexusSidebar.classList.contains('open')) {
+                if (sidebarToggle) _safeAddClass(sidebarToggle, 'hidden');
+            } else {
+                if (sidebarToggle && !(sidebar && sidebar.classList.contains('open'))) _safeRemoveClass(sidebarToggle, 'hidden');
+            }
+        }
+
+        // Atualiza body class para comportamento não-overlay em tamanhos médios (tablet scenario)
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) {
+            document.body.classList.toggle('nexus-visible', nexusSidebar.classList.contains('open'));
+        } else {
+            _safeRemoveClass(document.body, 'nexus-visible');
+        }
+    });
+}
+
+
+
+// ===============================================================================================//
+// ============================================================================================//
 // Bloco 6: Lógica de Fechamento por Clique Externo
     // --- FECHAR TECLADO, SIDEBAR E GERENCIAR CLIQUES NO STACKED PANEL POR CLIQUE FORA ---
     document.addEventListener('click', (e) => {
+        // CRÍTICO: Se a tela for LARGUE (> 1200px), as sidebars são FIXAS.
+        // O clique externo DEVE ser ignorado para evitar que as sidebars "pulem".
+        if (window.innerWidth > LARGE_SCREEN_BREAKPOINT) {
+             // A única exceção é o teclado virtual, que ainda pode ser fechado por clique externo
+             if (keyboardContainer && keyboardContainer.classList.contains('open')) {
+                 const isClickInsideKeyboard = keyboardContainer && keyboardContainer.contains(e.target);
+                 const isClickOnEditor = (e.composedPath && typeof e.composedPath === 'function' && e.composedPath().includes(mf));
+                 const isClickOnKeyboardToggle = keyboardToggleBtn && keyboardToggleBtn.contains(e.target);
+                 const isClickOnVariablePanel = variablesList && variablesList.contains(e.target);
+
+                 if (!isClickInsideKeyboard && !isClickOnEditor && !isClickOnKeyboardToggle && !isClickOnVariablePanel) {
+                     toggleKeyboard(false);
+                 }
+             }
+            return; // Sai da função para ignorar o fechamento das sidebars
+        }
+
         const isClickOnSidebarToggle = sidebarToggle && sidebarToggle.contains(e.target);
-        const isClickOnMemorialToggle = memorialToggle && memorialToggle.contains(e.target);
-        const isClickOnMemorialRecolher = memorialRecolher && memorialRecolher.contains(e.target); 
+        // isClickOnMemorialToggle REMOVIDO
+        const isClickOnNexusToggle = nexusToggle && nexusToggle.contains(e.target);
+        // isClickOnMemorialRecolher REMOVIDO
         const isClickOnKeyboardToggle = keyboardToggleBtn && keyboardToggleBtn.contains(e.target);
         // NOVO: Verifica se o clique foi no botão Limpar Histórico
         const isClickOnClearHistBtn = clearHistBtn && clearHistBtn.contains(e.target);
@@ -276,7 +772,16 @@ window.onload = function() {
         const isClickInsideKeyboard = keyboardContainer && keyboardContainer.contains(e.target);
 
         // --- Variáveis de verificação de foco ---
-        const isClickOnEditor = mf && mf.contains(e.target);
+        const isClickOnEditor = (function(){
+            try {
+                if (!mf) return false;
+                if (mf.contains && mf.contains(e.target)) return true;
+                if (e.composedPath && typeof e.composedPath === 'function' && e.composedPath().includes(mf)) return true;
+                if (document.activeElement === mf) return true;
+                if (document.activeElement && document.activeElement.tagName && document.activeElement.tagName.toLowerCase() === 'math-field') return true;
+            } catch(err) { }
+            return false;
+        })();
         const isClickOnVariablePanel = variablesList && variablesList.contains(e.target);
         
         // --- 1. Lógica para fechar a Sidebar (Histórico) ---
@@ -284,27 +789,39 @@ window.onload = function() {
             const isClickInsideSidebar = sidebar.contains(e.target);
             
             // CRÍTICO: Não fechar se o clique for nos toggles, nem no botão Limpar (que está no sidebar)
-            if (!isClickInsideSidebar && !isClickOnSidebarToggle && !isClickOnMemorialToggle && !isClickOnClearHistBtn) { 
+            // isClickOnMemorialToggle REMOVIDO
+            if (!isClickInsideSidebar && !isClickOnSidebarToggle && !isClickOnClearHistBtn) { 
                 sidebar.classList.remove('open');
+                // Adicionado: Remove explicitamente a classe de visibilidade
+                document.body.classList.remove('sidebar-visible');
+                
                 // Reabilita os botões de toggle se o Histórico fechar e NADA mais estiver aberto
-                if (window.innerWidth <= MOBILE_BREAKPOINT && !keyboardContainer.classList.contains('open') && !memorialSidebar.classList.contains('open')) {
+                if (window.innerWidth <= MOBILE_BREAKPOINT && !keyboardContainer.classList.contains('open') && !nexusSidebar.classList.contains('open')) {
                     keyboardToggleBtn.classList.remove('hidden');
-                    memorialToggle.classList.remove('hidden'); 
+                    // Certifica-se de que o NEXUS toggle reaparece se ele não estiver aberto
+                    if (nexusToggle && !nexusSidebar.classList.contains('open')) nexusToggle.classList.remove('hidden');
                 }
             }
         }
         
         // --- 1B. Lógica para fechar a Sidebar (Memorial) ---
-        if (memorialSidebar && memorialSidebar.classList.contains('open')) {
-            const isClickInsideMemorial = memorialSidebar.contains(e.target);
-            
-            // O Memorial só deve fechar se o clique NÃO FOR dentro dele, nem em nenhum dos toggles de painel
-            if (!isClickInsideMemorial && !isClickOnMemorialToggle && !isClickOnMemorialRecolher && !isClickOnKeyboardToggle && !isClickInsideKeyboard && !isClickOnSidebarToggle) { 
-                memorialSidebar.classList.remove('open');
-                // Reabilita os botões de toggle se o Memorial fechar e NADA mais estiver aberto
-                if (window.innerWidth <= MOBILE_BREAKPOINT && !keyboardContainer.classList.contains('open') && !sidebar.classList.contains('open')) {
-                    sidebarToggle.classList.remove('hidden'); 
-                    keyboardToggleBtn.classList.remove('hidden');
+        // MEMORIAL FOI REMOVIDO E TRANSFORMADO EM PAINEL FIXO (#app-library)
+
+        // --- 1C. Lógica para fechar a Sidebar (NEXUS esquerdo) ---
+        if (nexusSidebar && nexusSidebar.classList.contains('open')) {
+            const isClickInsideNexus = nexusSidebar.contains(e.target);
+            if (!isClickInsideNexus && !isClickOnNexusToggle && !isClickOnKeyboardToggle && !isClickOnEditor) {
+                nexusSidebar.classList.remove('open');
+                // Adicionado: Remove explicitamente a classe de visibilidade
+                document.body.classList.remove('nexus-visible');
+                
+                if (window.innerWidth <= MOBILE_BREAKPOINT) {
+                    // Re-enable other toggles if needed
+                    // Apenas reabilita se o Histórico e o Teclado não estiverem abertos
+                    if (!sidebar.classList.contains('open') && !keyboardContainer.classList.contains('open')) {
+                         sidebarToggle.classList.remove('hidden');
+                         keyboardToggleBtn.classList.remove('hidden');
+                    }
                 }
             }
         }
@@ -317,16 +834,12 @@ window.onload = function() {
                 toggleKeyboard(false);
             }
         }
-
-        // --- 3. Lógica para alternar o Conteúdo Interno das Abas (Handles) ---
-        
-        // Navegação de Categorias Fórmulas (Fórmulas Ativa) - REMOVIDO, pois agora é um painel de rolagem único.
-        // Navegação de Abas Toolbar (Funções Ativa) - REMOVIDO, pois agora é um painel de rolagem único.
-        
-        // Esta seção pode ser omitida inteiramente agora que Funções e Fórmulas são rolagem única e não têm navegação interna.
-        // Deixamos apenas o fechamento de painéis laterais (1, 1B e 2)
     });
 
+
+
+// ===============================================================================================//
+// ===============================================================================================//
 // Bloco 7: Funções Auxiliares (Limpeza e Formato Excel)
     // --- FUNÇÕES AUXILIARES ---
     function cleanMathString(str) {
@@ -351,6 +864,10 @@ window.onload = function() {
         return "=" + cleanExpr.replace(/\^/g, "^"); 
     }
 
+
+
+// ===============================================================================================//
+// ===============================================================================================//
 // Bloco 8: Atualização do Painel Técnico (LaTeX/Excel)
     // CORREÇÃO: Limpamos o código LaTeX para evitar \textasciicircum2
     function updateTechPane() {
@@ -371,6 +888,10 @@ window.onload = function() {
     // Garante que o painel técnico seja atualizado na inicialização
     updateTechPane();
 
+
+
+// ===============================================================================================//
+// ===============================================================================================//
 // Bloco 9: Configuração e Eventos do MathLive
     // --- CONFIGURAÇÃO DO EDITOR MATHLIVE (USANDO SETOPTIONS ANTIGO, MAS FUNCIONAL) ---
     try {
@@ -384,16 +905,27 @@ window.onload = function() {
                 keypressSound: null 
             });
             
+            // Keep keyboard open while typing: ensure focus/keydown won't auto-close it
             mf.addEventListener('keydown', (e) => {
-                if (e.key === ' ') { 
-                    e.preventDefault(); 
-                    // Insere um espaço LaTeX (\;) para tentar forçar a revalidação
-                    mf.executeCommand('insert', '\\;'); 
-                    // MathLive geralmente renderiza bem com setTimeout após comandos
-                    setTimeout(updateTechPane, 10); 
-                    return; 
+                // For space, insert a small spacing command and update technical pane.
+                // IMPORTANT: Do NOT open the virtual keyboard here — keyboard must open only via the button.
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    mf.executeCommand('insert', '\\;');
+                    setTimeout(updateTechPane, 10);
+                    return;
                 }
                 if (e.key === 'Enter') { e.preventDefault(); performCalculation(); }
+                // Do not modify keyboard open/close state on general key presses.
+            });
+
+            // When the math-field gains focus do not auto-open the virtual keyboard.
+            mf.addEventListener('focus', () => {
+                // keep behavior passive: only update pane
+                setTimeout(updateTechPane, 10);
+            });
+            mf.addEventListener('blur', () => {
+                // don't auto-close here; document click handles intentional closes
             });
 
             // CORREÇÃO CRÍTICA: Revertendo para o listener de 'input' simples que funcionava
@@ -405,6 +937,11 @@ window.onload = function() {
     } catch (e) { console.error("Erro MathLive:", e); }
     // --- FIM CONFIGURAÇÃO MATHLIVE ---
 
+
+
+
+// ===============================================================================================//
+// ===============================================================================================//
 // Bloco 10: Lógica de Histórico
     // --- HISTÓRICO ---
     let calculationHistory = JSON.parse(localStorage.getItem('engineer_v5_history') || '[]');
@@ -472,6 +1009,10 @@ window.onload = function() {
     });
     updateHistoryUI();
 
+
+
+// ===============================================================================================//
+// ===============================================================================================//    
 // Bloco 11: Lógica de Variáveis
     let variables = JSON.parse(localStorage.getItem('engineer_v5_variables') || '[]');
     if (variablesList) {
@@ -571,6 +1112,10 @@ window.onload = function() {
         renderVariables();
     }
 
+
+
+// ===============================================================================================//
+// ===============================================================================================//    
 // Bloco 12: Função de Cálculo Principal (performCalculation)
     // --- 5. FUNÇÃO DE CÁLCULO (COM PLOTLY) ---
     async function performCalculation() {
@@ -697,6 +1242,10 @@ window.onload = function() {
         toggleKeyboard(false); // Fecha o teclado ao limpar
     });
 
+
+
+// ===============================================================================================//
+// ===============================================================================================//    
     // Bloco 13: Listener de Toggles de Tema e Toolbar
     // --- TOOLBAR CLICK ---
     const toolbar = document.querySelector('#toolbar-content-area .toolbar-content');
@@ -737,7 +1286,11 @@ window.onload = function() {
         }
     });
 
-    // Bloco 14: Lógica de Salvar Variável
+
+
+// ===============================================================================================//
+// ===============================================================================================// 
+// Bloco 14: Lógica de Salvar Variável
     // --- SALVAR VARIÁVEL ---
     if (saveVarBtn) {
         saveVarBtn.addEventListener('click', () => {
@@ -772,62 +1325,80 @@ window.onload = function() {
         });
     }
 
+
+
+// ===============================================================================================//
+// ===============================================================================================// 
 // Bloco 15: Lógica de Visibilidade Responsiva (NOVO)
     function applyResponsiveVisibility() {
         const width = window.innerWidth;
         
-        if (!sidebar || !memorialSidebar || !sidebarToggle || !memorialToggle) return;
+        // allow function to run even if optional sidebars/toggles are missing
+        if (!sidebar || !sidebarToggle) return;
 
         // --- 1. Desktop/Widescreen (Width > 1200px) ---
         if (width > LARGE_SCREEN_BREAKPOINT) {
-            // Estado padrão: Ambas abertas. Toggles invisíveis.
+            // Estado padrão: Histórico e NEXUS abertos. Toggles invisíveis.
             sidebar.classList.add('open');
-            memorialSidebar.classList.add('open');
+            if (nexusSidebar) nexusSidebar.classList.add('open');
             
             // Remove a classe que impede a abertura forçada pelo CSS
             sidebar.classList.remove('override-close'); 
-            memorialSidebar.classList.remove('override-close');
             
             // Esconde os toggles (o CSS fará o trabalho real)
             sidebarToggle.classList.add('toggle-hidden');
-            memorialToggle.classList.add('toggle-hidden');
+            if (nexusToggle) nexusToggle.classList.add('toggle-hidden');
+            // Ensure body classes for large-screen visibility of both columns
+            document.body.classList.add('nexus-visible');
+            document.body.classList.add('sidebar-visible');
+            
+            // CRÍTICO: Garante que o botão flutuante esteja visível (a lógica do Teclado fará o hide/show)
+            if (!keyboardContainer.classList.contains('open')) keyboardToggleBtn.classList.remove('hidden');
+
 
         // --- 2. Tablet/Tela Média (901px a 1200px) ---
         } else if (width > MOBILE_BREAKPOINT && width <= LARGE_SCREEN_BREAKPOINT) {
-            // Estado padrão: Histórico fechado, Memorial aberto. Toggles visíveis.
-            sidebar.classList.remove('open');
-            memorialSidebar.classList.add('open');
+            // Estado padrão (Tablet/Médio): Histórico FIXO (coluna direita), NEXUS recolhida. Library é fixo.
+            sidebar.classList.add('open');
+            if (nexusSidebar) nexusSidebar.classList.remove('open');
+
+            // Aplica/removes overrides para impedir comportamento CSS conflitante
+            sidebar.classList.remove('override-close'); 
+
+            // Toggle visibilidade
+            sidebarToggle.classList.add('toggle-hidden'); // CRÍTICO: Esconde o toggle do Histórico quando a gaveta está sempre aberta
+            if (nexusToggle) nexusToggle.classList.remove('toggle-hidden');
+
+            // Body class: right sidebar is visible in this breakpoint
+            document.body.classList.add('sidebar-visible');
+            document.body.classList.remove('nexus-visible');
             
-            // Aplica a classe para garantir que o CSS não force a abertura/fechamento
-            sidebar.classList.add('override-close'); 
-            memorialSidebar.classList.remove('override-close');
-            
-            // Toggle do Histórico visível. Toggle do Memorial escondido.
-            sidebarToggle.classList.remove('toggle-hidden'); 
-            memorialToggle.classList.add('toggle-hidden');
+            // CRÍTICO: Garante que o botão flutuante esteja visível (a lógica do Teclado fará o hide/show)
+            if (!keyboardContainer.classList.contains('open')) keyboardToggleBtn.classList.remove('hidden');
+
 
         // --- 3. Mobile (Width <= 900px) ---
         } else {
-            // Estado padrão: Ambas fechadas. Toggles visíveis.
+            // Estado padrão: Ambas fechadas. Toggles visíveis. Library é fixo.
             sidebar.classList.remove('open');
-            memorialSidebar.classList.remove('open');
+            if (nexusSidebar) nexusSidebar.classList.remove('open');
             
             // Aplica a classe para garantir que o CSS não force a abertura/fechamento
             sidebar.classList.add('override-close'); 
-            memorialSidebar.classList.add('override-close');
+            if (nexusSidebar) nexusSidebar.classList.add('override-close');
             
             // Ambos os toggles visíveis.
             sidebarToggle.classList.remove('toggle-hidden');
-            memorialToggle.classList.remove('toggle-hidden');
+            if (nexusToggle) nexusToggle.classList.remove('toggle-hidden');
+            document.body.classList.remove('nexus-visible');
             
-            // Garante que o botão do teclado seja visível no mobile se nada estiver aberto
+            // CRÍTICO: Garante que o botão do teclado seja visível no mobile se nada estiver aberto
             if (!keyboardContainer.classList.contains('open')) keyboardToggleBtn.classList.remove('hidden');
         }
     }
 
     // Adiciona a classe override-close para evitar que a regra CSS de 1201px abra tudo
     sidebar.classList.add('override-close');
-    memorialSidebar.classList.add('override-close');
 
     // Executa a lógica na inicialização
     applyResponsiveVisibility();
@@ -835,6 +1406,10 @@ window.onload = function() {
     // Executa a lógica no redimensionamento da janela
     window.addEventListener('resize', applyResponsiveVisibility);
 
+
+
+// ===============================================================================================//
+// ===============================================================================================// 
 // Bloco 16: Lógica de Inserção de Fórmulas
     // --- INSERÇÃO DE FÓRMULAS NO EDITOR PRINCIPAL ---
     const formulaContentAreaEl = getEl('formula-content-area');
@@ -849,24 +1424,61 @@ window.onload = function() {
                 const formulaMathField = formulaItem.querySelector('math-field[read-only]');
                 
                 if (formulaMathField) {
-                    // Obtém o valor LaTeX completo da fórmula
-                    let latexValue = formulaMathField.value;
-                    
-                    // CORREÇÃO CRÍTICA (1): Não dividimos mais pelo '='.
-                    // A fórmula completa, incluindo a variável de saída (ex: x=, c^2=), deve ser inserida.
-                    
-                    // Limpa quaisquer comandos de texto remanescentes
-                    latexValue = latexValue.replace(/\\text\{.*?\}/g, '').trim();
+                    // Obtém o valor LaTeX completo da fórmula. O MathLive pode expor
+                    // o conteúdo via atributo `value`, via propriedade `.value` ou
+                    // via API `.getValue()`; tentamos de forma robusta.
+                    let latexValue = null;
+
+                    try {
+                        if (formulaMathField.getAttribute && formulaMathField.getAttribute('value')) {
+                            latexValue = formulaMathField.getAttribute('value');
+                        } else if (typeof formulaMathField.getValue === 'function') {
+                            // prefer explicit format when available
+                            try { latexValue = formulaMathField.getValue('latex'); } catch (err) { latexValue = formulaMathField.getValue(); }
+                        } else if (typeof formulaMathField.value !== 'undefined') {
+                            latexValue = formulaMathField.value;
+                        }
+                    } catch (err) {
+                        // silenciosamente ignore e continue
+                    }
+
+                    if (latexValue && typeof latexValue === 'string') {
+                        // Remove comandos de texto e espaços extras
+                        latexValue = latexValue.replace(/\\text\{.*?\}/g, '').trim();
+                    }
 
                     if (latexValue) {
                         // Insere a fórmula COMPLETA no editor principal
-                        mf.setValue(latexValue); 
+                        mf.setValue(latexValue);
                         mf.focus();
-                        setTimeout(updateTechPane, 100); 
+                        setTimeout(updateTechPane, 100);
                     }
                 }
             }
         });
+        // Ensure each .formula-item has a transparent overlay that captures clicks
+        function ensureFormulaOverlays() {
+            document.querySelectorAll('.formula-item').forEach(item => {
+                // set math-field to be non-focusable to avoid caret from keyboard/tab
+                const mfChild = item.querySelector('math-field');
+                if (mfChild) {
+                    try { mfChild.setAttribute('tabindex', '-1'); } catch (e) {}
+                    try { mfChild.setAttribute('aria-hidden', 'true'); } catch (e) {}
+                }
+
+                if (!item.querySelector('.formula-overlay')) {
+                    const ov = document.createElement('div');
+                    ov.className = 'formula-overlay';
+                    // clicking the overlay should bubble and be handled by existing delegation
+                    item.appendChild(ov);
+                }
+            });
+        }
+
+        // Run once and after any layout update that might add/remove formula items
+        ensureFormulaOverlays();
+        // If future dynamic insertion occurs, keep overlays in sync on resize
+        window.addEventListener('resize', () => { setTimeout(ensureFormulaOverlays, 80); });
     }
 
 };

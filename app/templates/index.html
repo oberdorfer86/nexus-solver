@@ -1,4 +1,3 @@
-<!-- Bloco 1: Head, Configuração e Estilos -->
 <!DOCTYPE html>
 <html lang="pt-br" data-theme="light">
 <head>
@@ -33,12 +32,342 @@
                 </div>
             </header>
             
-<!-- Bloco 2: Navegação Central (Antiga, agora removida) -->
-            
-<!-- Bloco 3: Área de Conteúdo (Funções e Fórmulas) - Antiga, agora removida -->
-            
-<!-- Bloco 4: Seção Editor (Variáveis, Input, Ações) -->
-            <div class="editor-section"> 
+<div id="app-library" class="top-library">
+                <div class="sidebar-header">
+                    <h2><span class="material-icons-round">archive</span> NEXUS Library</h2>
+                    </div>
+
+                <div id="tab-controls-container" class="library-master-tabs">
+                    <div id="toolbar-main" class="tab-handle active"> 
+                         <span class="handle-title"><span class="material-icons-round">apps</span> Funções</span>
+                    </div>
+                    <div id="formula-container" class="tab-handle inactive">
+                        <span class="handle-title"><span class="material-icons-round">description</span> Fórmulas</span>
+                    </div>
+                </div>
+                
+                <div id="library-content-scroll" class="library-content-scroll">
+                    <div id="tab-content-area" class="library-detail-area">
+                        <div id="toolbar-content-area" class="tab-pane active">
+                            <div class="toolbar-content" style="display: block; padding-top: 0;">
+                                <div class="toolbar-section-title">BÁSICO</div>
+                                <div id="basico" class="toolbar-pane active">
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="+" title="Soma">+</button>
+                                        <button class="toolbar-btn" data-latex="-" title="Subtração">-</button>
+                                        <button class="toolbar-btn" data-latex="*" title="Multiplicação">×</button>
+                                        <button class="toolbar-btn" data-latex="/" title="Divisão">÷</button>
+                                        <button class="toolbar-btn" data-latex="=" title="Igualdade">=</button>
+                                        <button class="toolbar-btn" data-latex="\%" title="Porcentagem">%</button> 
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\left(\placeholder{}\right)" title="Parênteses">( )</button>
+                                        <button class="toolbar-btn" data-latex="\frac{\placeholder{}}{\placeholder{}}" title="Fração"><div class="fraction-icon"><span class="square-placeholder small"></span><span class="fraction-line"></span><span class="square-placeholder small"></span></div></button>
+                                        <button class="toolbar-btn" data-latex="\pi" title="Pi">π</button>
+                                        <button class="toolbar-btn" data-latex="e" title="Euler">e</button>
+                                        <button class="toolbar-btn" data-latex="\Delta" title="Delta (Variação)">Δ</button>
+                                        <button class="toolbar-btn" data-latex="\infty" title="Infinito">∞</button>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                
+                                <div class="toolbar-section-title">POTÊNCIA/RAIZ</div>
+                                <div id="potencia-raiz" class="toolbar-pane active">
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="x^2" title="Quadrado">x²</button>
+                                        <button class="toolbar-btn" data-latex="^{\placeholder{}}" title="Potência">x<span class="square-placeholder small"></span></button>
+                                        <button class="toolbar-btn" data-latex="^{-1}" title="Inverso">x⁻¹</button>
+                                        <button class="toolbar-btn" data-latex="x^{1/2}" title="Potência 1/2">x¹/²</button>
+                                        <button class="toolbar-btn" data-latex="x^{1/3}" title="Potência 1/3">x¹/³</button>
+                                        <button class="toolbar-btn" data-latex="x^{2/3}" title="Potência 2/3">x²/³</button>
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\sqrt{\placeholder{}}" title="Raiz Quadrada"><span class="root-symbol">√</span><span class="square-placeholder"></span></button>
+                                        <button class="toolbar-btn" data-latex="\sqrt[\placeholder{}]{\placeholder{}}" title="Raiz N-ésima"><span class="root-symbol">√</span><span class="square-placeholder sub"></span><span class="square-placeholder"></span></button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                
+                                <div class="toolbar-section-title">LOG/EXP</div>
+                                <div id="log-exp" class="toolbar-pane active">
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\log\left(\placeholder{}\right)">log</button>
+                                        <button class="toolbar-btn" data-latex="\ln\left(\placeholder{}\right)">ln</button>
+                                        <button class="toolbar-btn" data-latex="\log_{\placeholder{}}\left(\placeholder{}\right)" title="Log Base N">log<span class="square-placeholder sub"></span></button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="10^{\placeholder{}}">10<span class="square-placeholder small"></span></button>
+                                        <button class="toolbar-btn" data-latex="e^{\placeholder{}}">e<span class="square-placeholder small"></span></button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                
+                                <div class="toolbar-section-title">TRIGONOMETRIA</div>
+                                <div id="trigonometria" class="toolbar-pane active">
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\sin\left(\placeholder{}\right)">sin</button>
+                                        <button class="toolbar-btn" data-latex="\cos\left(\placeholder{}\right)">cos</button>
+                                        <button class="toolbar-btn" data-latex="\tan\left(\placeholder{}\right)">tan</button>
+                                        <button class="toolbar-btn" data-latex="\csc\left(\placeholder{}\right)">csc</button>
+                                        <button class="toolbar-btn" data-latex="\sec\left(\placeholder{}\right)">sec</button>
+                                        <button class="toolbar-btn" data-latex="\cot\left(\placeholder{}\right)">cot</button>
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\arcsin\left(\placeholder{}\right)">sin⁻¹</button>
+                                        <button class="toolbar-btn" data-latex="\arccos\left(\placeholder{}\right)">cos⁻¹</button>
+                                        <button class="toolbar-btn" data-latex="\arctan\left(\placeholder{}\right)">tan⁻¹</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">ESTAT/COMB</div>
+                                <div id="estat-comb" class="toolbar-pane active">
+                                     <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="!" title="Fatorial">n!</button>
+                                        <button class="toolbar-btn" data-latex="\binom{\placeholder{}}{\placeholder{}}" title="Combinação">nCr</button>
+                                        <button class="toolbar-btn" data-latex="P\left(\placeholder{},\placeholder{}\right)" title="Permutação">nPr</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\overline{x}" title="Média Amostral">x̄</button>
+                                        <button class="toolbar-btn" data-latex="\mu" title="Média Populacional">μ</button>
+                                        <button class="toolbar-btn" data-latex="\sigma" title="Desvio Padrão">σ</button>
+                                        <button class="toolbar-btn" data-latex="\sigma^2" title="Variância">σ²</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">AVANÇADO (Cálculo)</div>
+                                <div id="avancado" class="toolbar-pane active">
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\frac{d}{dx}">d/dx</button>
+                                        <button class="toolbar-btn" data-latex="\partial" title="Derivada Parcial">∂</button>
+                                        <button class="toolbar-btn" data-latex="\lim_{\placeholder{} \to \placeholder{}}">lim</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\int \placeholder{} dx">∫</button>
+                                        <button class="toolbar-btn" data-latex="\int_{\placeholder{}}^{\placeholder{}} \placeholder{} dx">∫<span class="square-placeholder sub" style="margin-left:-3px"></span><span class="square-placeholder small" style="margin-left:-3px; vertical-align: super;"></span></button>
+                                        <button class="toolbar-btn" data-latex="\sum_{\placeholder{}}^{\placeholder{}}">∑<span class="square-placeholder sub" style="margin-left:-3px"></span><span class="square-placeholder small" style="margin-left:-3px; vertical-align: super;"></span></button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">MATRIZ/VETOR</div>
+                                <div id="matriz-vetor" class="toolbar-pane active">
+                                     <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\begin{pmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{pmatrix}" title="Matriz 2x2" style="font-size: 0.8rem;">(2x2)</button>
+                                        <button class="toolbar-btn" data-latex="\begin{bmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{bmatrix}" title="Matriz 2x2 (Colchetes)" style="font-size: 0.8rem;">[2x2]</button>
+                                        <button class="toolbar-btn" data-latex="\begin{vmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{vmatrix}" title="Determinante" style="font-size: 0.8rem;">|2x2|</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\begin{pmatrix}\placeholder{} \\ \placeholder{}\end{pmatrix}" title="Vetor 2D" style="font-size: 0.8rem;">(2x1)</button>
+                                        <button class="toolbar-btn" data-latex="\begin{bmatrix}\placeholder{} \\ \placeholder{}\end{bmatrix}" title="Vetor 2D (Colchetes)" style="font-size: 0.8rem;">[2x1]</button>
+                                        <button class="toolbar-btn" data-latex="\vec{\placeholder{}}" title="Vetor (Símbolo)">v&#8407;</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                    <div class="toolbar-group">
+                                        <button class="toolbar-btn" data-latex="\det\left(\placeholder{}\right)" style="font-size: 1rem;">det</button>
+                                        <button class="toolbar-btn" data-latex="^{-1}" title="Matriz Inversa">M⁻¹</button>
+                                        <button class="toolbar-btn" data-latex="^{T}" title="Matriz Transposta">Mᵀ</button>
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                        <span class="toolbar-btn" style="visibility: hidden;"></span> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+<div id="formula-content-area" class="tab-pane inactive">
+                            <div class="formula-content-details">
+                                
+                                <div class="toolbar-section-title">Matemática Fundamental</div>
+                                <div id="form-mat-fund" class="formula-pane"> <div class="formula-item">
+                                        <h4>Fórmula de Bhaskara (Raízes Reais)</h4>
+                                        <math-field read-only value="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Teorema de Pitágoras (Hipotenusa)</h4>
+                                        <math-field read-only value="c^2 = a^2 + b^2"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Área do Círculo</h4>
+                                        <math-field read-only value="A = \pi r^2"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Derivada Básica (potência)</h4>
+                                        <math-field read-only value="\frac{d}{dx} x^n = n x^{n-1}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Integral Básica (potência)</h4>
+                                        <math-field read-only value="\int x^n dx = \frac{x^{n+1}}{n+1} + C"></math-field>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">Mecânica Estrutural</div>
+                                <div id="form-mec-estr" class="formula-pane">
+                                    <div class="formula-item">
+                                        <h4>Tensão Normal em Vigas (Flexão)</h4>
+                                        <math-field read-only value="\sigma = \frac{M y}{I}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Momento de Inércia (Retângulo)</h4>
+                                        <math-field read-only value="I = \frac{b h^3}{12}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Deflexão Máxima (Viga simplesmente apoiada, Carga distribuída w)</h4>
+                                        <math-field read-only value="y_{max} = \frac{5 w L^4}{384 E I}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Tensão de Cisalhamento Transversal</h4>
+                                        <math-field read-only value="\tau = \frac{V Q}{I b}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Fórmula do Coeficiente de Segurança</h4>
+                                        <math-field read-only value="CS = \frac{\sigma_{limite}}{\sigma_{aplicada}}"></math-field>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">Termodinâmica</div>
+                                <div id="form-term" class="formula-pane">
+                                    <div class="formula-item">
+                                        <h4>Equação de Estado (Gás Ideal)</h4>
+                                        <math-field read-only value="PV = nRT"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Primeira Lei da Termodinâmica (Sistema Fechado)</h4>
+                                        <math-field read-only value="\Delta U = Q - W"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Condução de Calor (Lei de Fourier)</h4>
+                                        <math-field read-only value="q = -k A \frac{dT}{dx}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Eficiência Térmica (Ciclo Carnot)</h4>
+                                        <math-field read-only value="\eta_{Carnot} = 1 - \frac{T_C}{T_H}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Vazão Mássica</h4>
+                                        <math-field read-only value="\dot{m} = \rho A v"></math-field>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">Eletricidade & Eletrônica</div>
+                                <div id="form-eletrica" class="formula-pane">
+                                    <div class="formula-item">
+                                        <h4>Lei de Ohm</h4>
+                                        <math-field read-only value="V = R I"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Potência Elétrica (DC)</h4>
+                                        <math-field read-only value="P = V I = I^2 R = \frac{V^2}{R}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Impedância (RLC Série)</h4>
+                                        <math-field read-only value="Z = R + j \left(\omega L - \frac{1}{\omega C}\right)"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Constante de Tempo RC</h4>
+                                        <math-field read-only value="\tau = R C"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Frequência de Ressonância (RLC)</h4>
+                                        <math-field read-only value="f_0 = \frac{1}{2\pi \sqrt{LC}}"></math-field>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">Hidráulica & Fluidos</div>
+                                <div id="form-hidraulica" class="formula-pane">
+                                    <div class="formula-item">
+                                        <h4>Equação da Continuidade (Vazão)</h4>
+                                        <math-field read-only value="Q = A v"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Bernoulli (Energia)</h4>
+                                        <math-field read-only value="\frac{P}{\gamma} + \frac{v^2}{2g} + z = \text{constante}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Número de Reynolds</h4>
+                                        <math-field read-only value="Re = \frac{\rho v D}{\mu}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Perda de Carga (Darcy-Weisbach)</h4>
+                                        <math-field read-only value="h_f = f \frac{L}{D} \frac{v^2}{2g}"></math-field>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                
+                                <div class="toolbar-section-title">Controle & Sistemas</div>
+                                <div id="form-controle" class="formula-pane">
+                                    <div class="formula-item">
+                                        <h4>Função de Transferência (1ª ordem)</h4>
+                                        <math-field read-only value="G(s) = \frac{K}{\tau s + 1}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Resposta ao Degrau (1ª ordem)</h4>
+                                        <math-field read-only value="y(t) = K\left(1 - e^{-t/\tau}\right) u(t)"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Erro de Regime Estacionário</h4>
+                                        <math-field read-only value="e_{ss} = \lim_{s \to 0} s E(s)"></math-field>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+
+                                <div class="toolbar-section-title">Cálculo Avançado</div>
+                                <div id="form-calculo" class="formula-pane">
+                                    <div class="formula-item">
+                                        <h4>Regra da Cadeia (Derivada)</h4>
+                                        <math-field read-only value="\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Integral por Partes</h4>
+                                        <math-field read-only value="\int u dv = uv - \int v du"></math-field>
+                                    </div>
+                                    <div class="formula-item">
+                                        <h4>Teorema Fundamental do Cálculo</h4>
+                                        <math-field read-only value="\int_a^b f(x) dx = F(b) - F(a)"></math-field>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<div class="editor-section"> 
                 
                 <div class="variables-panel">
                     <div class="variables-header">
@@ -93,8 +422,7 @@
 
             </div>
             
-<!-- Bloco 5: Seção Resultado e Plotly -->
-            <div id="result-area" class="result-card hidden">
+<div id="result-area" class="result-card hidden">
                 <div class="result-header">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <h3>Resultado</h3>
@@ -113,8 +441,7 @@
 
         </main>
 
-<!-- Bloco 6: Histórico (Sidebar Direita) -->
-        <aside class="sidebar" id="app-sidebar">
+<aside class="sidebar" id="app-sidebar">
             <div class="sidebar-header">
                 <h2><span class="material-icons-round">history</span> Histórico</h2>
                 <button id="clear-history-btn" class="btn-icon" title="Limpar Histórico">
@@ -131,311 +458,26 @@
             </div>
         </aside>
 
-<!-- Bloco 7: NEXUS Library (Gaveta Esquerda, Novo Conteúdo) e Toggles Flutuantes -->
-<aside class="memorial-sidebar" id="app-memorial">
-            <div class="sidebar-header">
-                <h2><span class="material-icons-round">archive</span> NEXUS Library</h2>
-                
-                <button id="memorial-recolher" class="btn-icon" title="Recolher Library">
-                    <span class="material-icons-round">close</span>
-                </button>
-            </div>
-            
-            <div id="tab-controls-container" class="library-master-tabs">
-                <div id="toolbar-main" class="tab-handle active"> 
-                     <span class="handle-title"><span class="material-icons-round">apps</span> Funções</span>
-                </div>
-                <div id="formula-container" class="tab-handle inactive">
-                    <span class="handle-title"><span class="material-icons-round">description</span> Fórmulas</span>
-                </div>
-            </div>
-            
-            <div id="library-content-scroll" class="library-content-scroll">
-                <div id="tab-content-area" class="library-detail-area">
-                    
-                    <div id="toolbar-content-area" class="tab-pane active">
-                        
-                        <div class="toolbar-content" style="display: block; padding-top: 0;">
-                            
-                            <div class="toolbar-section-title">BÁSICO</div>
-                            <div id="basico" class="toolbar-pane active">
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="+" title="Soma">+</button>
-                                    <button class="toolbar-btn" data-latex="-" title="Subtração">-</button>
-                                    <button class="toolbar-btn" data-latex="*" title="Multiplicação">×</button>
-                                    <button class="toolbar-btn" data-latex="/" title="Divisão">÷</button>
-                                    <button class="toolbar-btn" data-latex="=" title="Igualdade">=</button>
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\left(\placeholder{}\right)" title="Parênteses">( )</button>
-                                    <button class="toolbar-btn" data-latex="\pi" title="Pi">π</button>
-                                    <button class="toolbar-btn" data-latex="e" title="Euler">e</button>
-                                    <button class="toolbar-btn" data-latex="\%" title="Porcentagem">%</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="x^2" title="Quadrado">x²</button>
-                                    <button class="toolbar-btn" data-latex="\sqrt{\placeholder{}}" title="Raiz Quadrada"><span class="root-symbol">√</span><span class="square-placeholder"></span></button>
-                                    <button class="toolbar-btn" data-latex="^{\placeholder{}}" title="Potência">x<span class="square-placeholder small"></span></button>
-                                    <button class="toolbar-btn" data-latex="\frac{\placeholder{}}{\placeholder{}}" title="Fração"><div class="fraction-icon"><span class="square-placeholder small"></span><span class="fraction-line"></span><span class="square-placeholder small"></span></div></button>
-                                    <button class="toolbar-btn" data-latex="^{-1}" title="Inverso">x⁻¹</button>
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn action-btn" data-latex="" onclick="document.getElementById('math-editor').executeCommand('deleteBackward')" title="⌫">⌫</button>
-                                    <button class="toolbar-btn action-btn" data-latex="" onclick="document.getElementById('math-editor').executeCommand('undo')" title="Desfazer"><span class="material-icons-round" style="font-size: 1.1rem;">undo</span></button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            
-                            <div class="toolbar-section-title">POTÊNCIA/RAIZ</div>
-                            <div id="potencia-raiz" class="toolbar-pane active">
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="^{\placeholder{}}" title="Potência">x<span class="square-placeholder small"></span></button>
-                                    <button class="toolbar-btn" data-latex="\sqrt{\placeholder{}}" title="Raiz Quadrada"><span class="root-symbol">√</span><span class="square-placeholder"></span></button>
-                                    <button class="toolbar-btn" data-latex="\sqrt[\placeholder{}]{\placeholder{}}" title="Raiz N-ésima"><span class="root-symbol">√</span><span class="square-placeholder sub"></span><span class="square-placeholder"></span></button>
-                                    <button class="toolbar-btn" data-latex="^{-1}" title="Inverso">x⁻¹</button>
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="x^{1/2}" title="Potência 1/2">x¹/²</button>
-                                    <button class="toolbar-btn" data-latex="x^{1/3}" title="Potência 1/3">x¹/³</button>
-                                    <button class="toolbar-btn" data-latex="x^{2/3}" title="Potência 2/3">x²/³</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            
-                            <div class="toolbar-section-title">LOG/EXP</div>
-                            <div id="log-exp" class="toolbar-pane active">
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\log\left(\placeholder{}\right)">log</button>
-                                    <button class="toolbar-btn" data-latex="\ln\left(\placeholder{}\right)">ln</button>
-                                    <button class="toolbar-btn" data-latex="\log_{\placeholder{}}\left(\placeholder{}\right)" title="Log Base N">log<span class="square-placeholder sub"></span></button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="10^{\placeholder{}}">10<span class="square-placeholder small"></span></button>
-                                    <button class="toolbar-btn" data-latex="e^{\placeholder{}}">e<span class="square-placeholder small"></span></button>
-                                    <button class="toolbar-btn" data-latex="\pi" title="Pi">π</button>
-                                    <button class="toolbar-btn" data-latex="e" title="Euler">e</button>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            
-                            <div class="toolbar-section-title">TRIGONOMETRIA</div>
-                            <div id="trigonometria" class="toolbar-pane active">
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\sin\left(\placeholder{}\right)">sin</button>
-                                    <button class="toolbar-btn" data-latex="\cos\left(\placeholder{}\right)">cos</button>
-                                    <button class="toolbar-btn" data-latex="\tan\left(\placeholder{}\right)">tan</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\arcsin\left(\placeholder{}\right)">sin⁻¹</button>
-                                    <button class="toolbar-btn" data-latex="\arccos\left(\placeholder{}\right)">cos⁻¹</button>
-                                    <button class="toolbar-btn" data-latex="\arctan\left(\placeholder{}\right)">tan⁻¹</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\csc\left(\placeholder{}\right)">csc</button>
-                                    <button class="toolbar-btn" data-latex="\sec\left(\placeholder{}\right)">sec</button>
-                                    <button class="toolbar-btn" data-latex="\cot\left(\placeholder{}\right)">cot</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                            </div>
-                            <div class="divider"></div>
+<aside class="sidebar left" id="app-nexus">
+    <div class="sidebar-header">
+        <h2><span class="material-icons-round">dashboard</span> NEXUS</h2>
+        </div>
+    <div id="nexus-content" class="history-content">
+        <div class="empty-state">Painel NEXUS.</div>
+    </div>
+    <div class="sidebar-footer">
+        <small>© NEXUS</small>
+    </div>
+</aside>
 
-                            <div class="toolbar-section-title">ESTAT/COMB</div>
-                            <div id="estat-comb" class="toolbar-pane active">
-                                 <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="!" title="Fatorial">n!</button>
-                                    <button class="toolbar-btn" data-latex="\binom{\placeholder{}}{\placeholder{}}" title="Combinação">nCr</button>
-                                    <button class="toolbar-btn" data-latex="P\left(\placeholder{},\placeholder{}\right)" title="Permutação">nPr</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\overline{x}" title="Média Amostral">x̄</button>
-                                    <button class="toolbar-btn" data-latex="\mu" title="Média Populacional">μ</button>
-                                    <button class="toolbar-btn" data-latex="\sigma" title="Desvio Padrão">σ</button>
-                                    <button class="toolbar-btn" data-latex="\sigma^2" title="Variância">σ²</button>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
+<button id="nexus-toggle" title="Abrir/Fechar NEXUS">
+    <span class="material-icons-round" id="nexus-toggle-icon">chevron_right</span>
+    NEXUS
+</button>
 
-                            <div class="toolbar-section-title">AVANÇADO (Cálculo)</div>
-                            <div id="avancado" class="toolbar-pane active">
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\int \placeholder{} dx">∫</button>
-                                    <button class="toolbar-btn" data-latex="\int_{\placeholder{}}^{\placeholder{}} \placeholder{} dx">∫<span class="square-placeholder sub" style="margin-left:-3px"></span><span class="square-placeholder small" style="margin-left:-3px; vertical-align: super;"></span></button>
-                                    <button class="toolbar-btn" data-latex="\frac{d}{dx}">d/dx</button>
-                                    <button class="toolbar-btn" data-latex="\partial" title="Derivada Parcial">∂</button>
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\sum_{\placeholder{}}^{\placeholder{}}">∑<span class="square-placeholder sub" style="margin-left:-3px"></span><span class="square-placeholder small" style="margin-left:-3px; vertical-align: super;"></span></button>
-                                    <button class="toolbar-btn" data-latex="\lim_{\placeholder{} \to \placeholder{}}">lim</button>
-                                    <button class="toolbar-btn" data-latex="\infty">∞</button>
-                                    <button class="toolbar-btn" data-latex="\Delta" title="Delta (Variação)">Δ</button>
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\vec{\placeholder{}}" title="Vetor (Símbolo)">v&#8407;</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">MATRIZ/VETOR</div>
-                            <div id="matriz-vetor" class="toolbar-pane active">
-                                 <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\begin{pmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{pmatrix}" title="Matriz 2x2" style="font-size: 0.8rem;">(2x2)</button>
-                                    <button class="toolbar-btn" data-latex="\begin{bmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{bmatrix}" title="Matriz 2x2 (Colchetes)" style="font-size: 0.8rem;">[2x2]</button>
-                                    <button class="toolbar-btn" data-latex="\begin{vmatrix}\placeholder{} & \placeholder{} \\ \placeholder{} & \placeholder{}\end{vmatrix}" title="Determinante" style="font-size: 0.8rem;">|2x2|</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\begin{pmatrix}\placeholder{} \\ \placeholder{}\end{pmatrix}" title="Vetor 2D" style="font-size: 0.8rem;">(2x1)</button>
-                                    <button class="toolbar-btn" data-latex="\begin{bmatrix}\placeholder{} \\ \placeholder{}\end{bmatrix}" title="Vetor 2D (Colchetes)" style="font-size: 0.8rem;">[2x1]</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                                <div class="toolbar-group">
-                                    <button class="toolbar-btn" data-latex="\det\left(\placeholder{}\right)" style="font-size: 1rem;">det</button>
-                                    <button class="toolbar-btn" data-latex="^{-1}" title="Matriz Inversa">M⁻¹</button>
-                                    <button class="toolbar-btn" data-latex="^{T}" title="Matriz Transposta">Mᵀ</button>
-                                    <span class="toolbar-btn" style="visibility: hidden;"></span> 
-                                </div>
-                            </div>
-                            </div>
-                    </div>
-                    
-                    <div id="formula-content-area" class="tab-pane inactive">
-                        
-                        <div class="formula-content-details">
-                            
-                            <div class="toolbar-section-title">Matemática Fundamental</div>
-                            <div id="form-mat-fund" class="formula-pane">
-                                <div class="formula-item">
-                                    <h4>Fórmula de Bhaskara</h4>
-                                    <math-field read-only value="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Teorema de Pitágoras</h4>
-                                    <math-field read-only value="c^2 = a^2 + b^2"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Área do Círculo</h4>
-                                    <math-field read-only value="A = \pi r^2"></math-field>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">Física Clássica (Cinemática)</div>
-                            <div id="form-fis-clas" class="formula-pane">
-                                <div class="formula-item">
-                                    <h4>Velocidade Média</h4>
-                                    <math-field read-only value="v_m = \frac{\Delta s}{\Delta t}"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Função Horária da Posição (MRUV)</h4>
-                                    <math-field read-only value="s = s_0 + v_0 t + \frac{1}{2} a t^2"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Equação de Torricelli</h4>
-                                    <math-field read-only value="v^2 = v_0^2 + 2 a \Delta s"></math-field>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">Cálculo & Engenharia (Geral)</div>
-                            <div id="form-calc-eng" class="formula-pane">
-                                <div class="formula-item">
-                                    <h4>Regra da Cadeia (Chain Rule)</h4>
-                                    <math-field read-only value="\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Tensão Normal (σ)</h4>
-                                    <math-field read-only value="\sigma = \frac{F}{A}"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Módulo de Elasticidade (Lei de Hooke)</h4>
-                                    <math-field read-only value="E = \frac{\sigma}{\epsilon}"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Fator de Segurança (FS)</h4>
-                                    <math-field read-only value="FS = \frac{\sigma_{ruptura}}{\sigma_{aplicada}}"></math-field>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">Engenharia Elétrica</div>
-                            <div id="form-eng-eletrica" class="formula-pane">
-                                <div class="formula-item">
-                                    <h4>Lei de Ohm</h4>
-                                    <math-field read-only value="V = R \cdot I"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Potência Elétrica</h4>
-                                    <math-field read-only value="P = V \cdot I"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Resistência em Série</h4>
-                                    <math-field read-only value="R_{eq} = R_1 + R_2 + \dots + R_n"></math-field>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">Engenharia Hidráulica & Fluidos</div>
-                            <div id="form-eng-hidraulica" class="formula-pane">
-                                <div class="formula-item">
-                                    <h4>Equação da Continuidade</h4>
-                                    <math-field read-only value="Q = A \cdot v"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Equação de Bernoulli (Simplificada)</h4>
-                                    <math-field read-only value="P + \frac{1}{2} \rho v^2 + \rho g h = \text{constante}"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Pressão Hidrostática</h4>
-                                    <math-field read-only value="P = \rho g h"></math-field>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">Física Moderna</div>
-                            <div id="form-fis-moderna" class="formula-pane">
-                                <div class="formula-item">
-                                    <h4>Equação de Einstein (Massa-Energia)</h4>
-                                    <math-field read-only value="E = m c^2"></math-field>
-                                </div>
-                                <div class="formula-item">
-                                    <h4>Energia de um Fóton</h4>
-                                    <math-field read-only value="E = h f"></math-field>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-
-                            <div class="toolbar-section-title">Configurações & Memória</div>
-                            <div id="form-config" class="formula-pane">
-                                <p>Conteúdo de Configurações e Memória...</p>
-                            </div>
-                            </div>
-                    </div>
-                </div>
-            </div>
-            
-        </aside>
-
-<!-- Bloco 8: Toggles Flutuantes (Mobile/Tablet) -->
-        <button id="sidebar-toggle" title="Abrir/Fechar Histórico">
+<button id="sidebar-toggle" title="Abrir/Fechar Histórico">
             <span class="material-icons-round" id="toggle-icon">chevron_left</span>
             Histórico
-        </button>
-        
-        <button id="memorial-toggle" title="Abrir/Fechar Library">
-            <span class="material-icons-round" id="toggle-icon">chevron_right</span>
-            Library
         </button>
         
         <div id="virtual-keyboard-container">
@@ -446,8 +488,7 @@
             Teclado
         </button>
         
-<!-- Bloco 9: Scripts de Base -->
-    </div>
+</div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script defer src="//unpkg.com/mathlive"></script>

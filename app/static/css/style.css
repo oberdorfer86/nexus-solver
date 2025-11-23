@@ -50,6 +50,13 @@ body {
     overflow: hidden; 
 }
 
+/* Slightly smaller base font for a more compact, professional look */
+html { font-size: 15px; }
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 2: Layout Base e Main Content */
 /* === LAYOUT NEXUS (Slide Sidebar) === */
 .app-layout {
@@ -68,11 +75,43 @@ body {
     flex-direction: column;
     /* CORREÇÃO CRÍTICA: Remover o gap do main-content para permitir que os painéis Toolbar/Formula se sobreponham no fluxo */
     gap: 0; 
-    padding-right: 60px; 
-    padding-left: 60px; /* Adicionado padding para os toggles */
+    padding-right: 30px; 
+    padding-left: 30px; /* Menor padding para alinhamento à esquerda */
     transition: margin-right 0.3s;
 }
 
+/* Force children to stretch full width and avoid centering by margins */
+.main-content {
+    align-items: stretch;
+    align-content: flex-start;
+}
+.main-content > * {
+    width: 100%;
+    max-width: 900px; /* ALTERADO: LARGURA PADRONIZADA */
+    margin-left: auto; /* ALTERADO: CENTRALIZAÇÃO */
+    margin-right: auto; /* ALTERADO: CENTRALIZAÇÃO */
+    align-self: stretch;
+}
+
+/* When sidebars are visible on larger screens, align main children to the
+   left edge of the available content area instead of centering them. This
+   ensures elements don't appear 'under' the fixed side column and instead
+   adapt to the left padding applied by the sidebars. */
+@media (min-width: 901px) {
+    body.sidebar-visible .main-content > *,
+    body.nexus-visible .main-content > *,
+    body.nexus-visible.sidebar-visible .main-content > * {
+        margin-left: 0; /* align to the left inside .main-content */
+        margin-right: 0;
+        max-width: none; /* allow element to fill the remaining content area */
+        align-self: stretch;
+    }
+}
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 3: Sidebar Histórico (Direita) */
 /* Sidebar Histórico (Antigo Memória) */
 .sidebar {
@@ -96,6 +135,19 @@ body {
 
 .sidebar.open {
     transform: translateX(0); 
+}
+
+/* Left-side variant for NEXUS */
+.sidebar.left {
+    left: 0;
+    right: auto;
+    border-left: none;
+    border-right: 1px solid var(--border);
+    box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+    transform: translateX(-100%);
+}
+.sidebar.left.open {
+    transform: translateX(0);
 }
 
 /* ======================================================= */
@@ -140,7 +192,7 @@ body {
     width: 35px;
 }
 #sidebar-toggle span {
-    font-size: 1.8rem; 
+    font-size: 1.4rem; 
     /* Gira a seta para apontar para a esquerda (sentido de abertura) */
     transform: rotate(-90deg); 
     transition: transform 0.3s ease-in-out;
@@ -149,16 +201,49 @@ body {
 
 /* Botão acompanha a sidebar quando abre (Desloca para a esquerda) */
 .sidebar.open ~ #sidebar-toggle {
-    right: 350px; /* 320px (sidebar) + 30px (padding/margem) */
+    right: 320px; /* 320px (sidebar) + 30px (padding/margem) */
 }
 .sidebar.open ~ #sidebar-toggle span {
     /* Seta aponta para a direita (indicando fechar) */
     transform: rotate(90deg);
 }
 
+/* Toggle do NEXUS (esquerda) - espelha o estilo do histórico */
+#nexus-toggle {
+    position: fixed;
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 130px;
+    writing-mode: vertical-rl;
+    font-weight: 600;
+    font-size: 1.1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    z-index: 1800;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: var(--primary);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, width 0.2s;
+}
+#nexus-toggle:hover { background: var(--bg-app); width: 35px; }
+#nexus-toggle span { font-size: 1.4rem; transform: rotate(90deg); transition: transform 0.3s ease-in-out; }
+
+/* Move toggle quando o painel NEXUS abrir */
+.sidebar.left.open ~ #nexus-toggle { left: 350px; }
+.sidebar.left.open ~ #nexus-toggle span { transform: rotate(-90deg); }
+
 /* NOVO: Classe para ocultar os toggles em mobile quando o teclado ou outra gaveta está aberta */
 /* Também esconde os toggles por padrão em desktop, confiando no JS para mostrá-los/escondê-los */
-#sidebar-toggle.hidden, #memorial-toggle.hidden {
+/* #memorial-toggle.hidden REMOVIDO */
+#sidebar-toggle.hidden {
     opacity: 0;
     pointer-events: none;
 }
@@ -167,13 +252,17 @@ body {
     display: none !important;
 }
 
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 4: Estilos Gerais (Header, Título) */
 /* === HEADER & LOGO === */
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px; /* Adiciona o gap removido do main-content */
+    margin-bottom: 15px; /* ALTERADO: Reduzido de 25px para 15px */
 }
 
 .brand {
@@ -182,9 +271,49 @@ body {
     gap: 10px;
     color: var(--primary);
 }
-h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+ h1 { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+
+/* Top-mounted Library (moved from left column) */
+.top-library {
+    width: 100%;
+    background: transparent;
+    margin-bottom: 8px;
+    display: block;
+    position: relative;
+    z-index: 1600; /* Above most content but below floating toggles */
+}
+.top-library .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 8px 0; /* ALTERADO: Removido o padding top de 6px */
+}
+.top-library #tab-controls-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.top-library #tab-content-area {
+    margin-top: 0;
+    padding: 12px;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* Make the tab handles smaller and horizontally flowing for top bar */
+.top-library .tab-handle { height: 38px; width: auto; padding: 0 12px; }
+
+/* On small screens, collapse the top library to a full-width stacked block */
+@media (max-width: 900px) {
+    .top-library { padding: 8px 0; }
+    .top-library #tab-controls-container { overflow-x: auto; }
+    .top-library #tab-content-area { padding: 10px; }
+}
 
 
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 5: Estilos da Toolbar/Abas de Navegação (Master-Detail) */
 /* === TOOLBAR (Horizontal Fix) === */
 #tab-controls-container {
@@ -198,8 +327,8 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 /* Estilo Base para as Abas (Handles) */
 .tab-handle {
     position: relative; /* Mantém no fluxo normal */
-    height: 40px; 
-    width: 180px; /* AJUSTADO: Largura estreita da aba */
+    height: 36px; 
+    width: 160px; /* AJUSTED: slightly narrower handles */
     padding: 0 10px;
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -209,12 +338,12 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     transition: all 0.3s;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     z-index: 15; /* Alto Z-index para flutuar */
 }
 /* Estilo para o Título do Handle */
 .tab-handle .handle-title, .tab-handle h2 {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-muted);
     display: flex;
@@ -242,9 +371,13 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     border-color: var(--border);
     color: var(--primary);
     background: var(--bg-card);
-    /* Desloca 1px para baixo para cobrir a linha do painel de conteúdo abaixo */
-    margin-top: 1px; 
-    height: 39px; 
+    /* Keep active/inactive box model identical to avoid layout shift */
+    margin-top: 0;
+    height: 36px;
+    padding-left: 10px;
+    padding-right: 10px;
+    /* Use a subtle inner highlight instead of changing size */
+    box-shadow: inset 0 -3px 0 0 rgba(59,130,246,0.08);
 }
 
 /* ---------------------------------------------------- */
@@ -257,17 +390,29 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     top: 0;
     left: 0;
     width: 100%;
-    margin-top: -1px; /* Cola na aba ativa */
+    margin-top: -1px; /* CRÍTICO: Cola na aba ativa */
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 0 var(--radius) var(--radius) var(--radius); /* Arredonda todos, exceto canto superior esquerdo para dar espaço para o handle */
-    padding: 20px;
+    /* CORREÇÃO CRÍTICA: Remove o padding principal. O padding será aplicado dentro dos painéis (.toolbar-content) */
+    padding: 0; 
     box-shadow: var(--shadow);
     z-index: 1; /* Fica abaixo dos handles */
+    /* NOVO: Adiciona overflow hidden para isolar o conteúdo interno */
+    overflow: hidden; 
 }
 
-.tab-pane { display: none; }
-.tab-pane.active { display: block; }
+/* CORREÇÃO CRÍTICA: As abas mestras devem ser display: block ou display: none */
+.tab-pane { 
+    /* CRÍTICO: Garante que as abas inativas sejam escondidas */
+    display: none !important; 
+    /* NOVO: Adiciona altura automática para o conteúdo */
+    height: auto; 
+} 
+.tab-pane.active { 
+    /* CRÍTICO: As abas ativas são blocos que definem o layout do seu conteúdo */
+    display: block !important; 
+}
 
 /* NOVO: Estilo para os Títulos de Seção de Funções/Fórmulas */
 .toolbar-section-title {
@@ -285,12 +430,14 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 #toolbar-content-area .toolbar-content, #formula-content-area {
     display: block !important; 
     padding-top: 0;
+    /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
+    padding: 0 20px 20px 20px; 
 }
-#toolbar-content-area .toolbar-pane, #formula-content-area .formula-pane {
-    /* Garante que todos os painéis internos estejam visíveis no fluxo único */
-    display: block !important; 
-    padding: 0; /* Remove padding desnecessário */
-}
+    /* By default category panes are hidden; JS will show the selected category pane */
+    #toolbar-content-area .toolbar-pane, #formula-content-area .formula-pane {
+        display: none;
+        padding: 0; /* Remove padding desnecessário */
+    }
 
 
 /* NÍVEL 2: CATEGORIAS (Navegação Master-Detail REMOVIDA) */
@@ -304,6 +451,39 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     padding-bottom: 10px;
 }
 
+    /* Category navigation (level-2 titles transformed into tabs) */
+    .category-nav {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 4px;
+        overflow-x: auto;
+        margin-bottom: 12px;
+    }
+    .category-nav .cat-btn {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--text-main);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .category-nav .cat-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    @media (max-width: 900px) {
+        .category-nav { padding: 6px 0; }
+        .category-nav .cat-btn { padding: 6px 10px; }
+    }
+
+    /* Smaller button sizing specifically for formula panes - ESTA REGRA FOI REMOVIDA 
+       para que todos os botões usem a nova dimensão de 48px do Bloco 7 */
+    
 /* NÍVEL 3: COMANDOS DE CÁLCULO (Agrupamento Vertical) */
 
 .toolbar-pane > div, .formula-content-details { 
@@ -313,41 +493,66 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     gap: 15px; /* Espaçamento entre grupos de botões */
     padding-top: 5px; /* Reduzido o padding top */
 }
+
+/* CORREÇÃO CRÍTICA: Configura o toolbar-pane para layout horizontal rolável (Funções) */
+.toolbar-pane {
+    display: none !important; /* Inicia todos os painéis de categoria como escondidos */
+    flex-direction: row !important; /* Define a direção flexível para quando for ativado */
+    flex-wrap: nowrap; 
+    overflow-x: auto !important; /* Mantém scroll horizontal */
+    overflow-y: hidden !important; /* CRÍTICO: Remove forçadamente scroll vertical */
+    padding-bottom: 10px; 
+    align-items: flex-start; 
+    gap: 15px; 
+    padding-top: 15px; 
+}
+/* CRÍTICO: Força o painel .active a ser exibido como FLEX. Este é o painel BÁSICO no carregamento inicial. */
+.toolbar-pane.active {
+    display: flex !important;
+}
+/* Estilos da scrollbar horizontal no .toolbar-pane */
+.toolbar-pane::-webkit-scrollbar {
+    height: 8px;
+}
+.toolbar-pane::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 10px;
+    border: 2px solid var(--bg-card);
+}
+.toolbar-pane::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 /* O formula-content-details já está com display block acima, vamos garantir o reset */
 .formula-content-details {
     display: block !important;
     margin-top: 0;
+    /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
+    padding: 0 20px 20px 20px; 
 }
 
 
-/*Correção Definitiva – Grid das Funções */
-.toolbar-group {
-    display: grid !important;          /* Força o grid a prevalecer */
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 10px !important;
-
-    width: 100% !important;            /* Garante largura total */
-    box-sizing: border-box !important;
-
-    /* Evita colapso do grid por herança externa */
-    align-items: center;
-    justify-items: center;
-
-    /* Remove possíveis interferências anteriores */
-    flex-direction: unset !important;
-    flex-wrap: unset !important;
-    overflow-x: hidden;
-}
+/* Correção Definitiva – Grid das Funções */
+/* Este bloco é AGORA obsoleto e será substituído por um estilo de grupo flex */
 
 
-/* CORREÇÃO CRÍTICA: O Separador AGORA é 100% Horizontal */
+/* CORREÇÃO CRÍTICA: O Separador AGORA é VERTICAL */
 .divider {
-    width: 100%; /* Força a linha horizontal */
-    height: 1px;
-    background: var(--border);
-    margin: 10px 0; /* Espaçamento vertical para separação de grupos */
-    display: block;
+    /* Oculta os divisores horizontais originais */
+    display: none !important;
 }
+
+/* NOVO: Separador Vertical entre os Grupos */
+/* Estilo para que o JS possa inserir um divisor vertical */
+.toolbar-pane .divider {
+    display: block !important;
+    width: 1px;
+    height: 100%; 
+    background: var(--border);
+    margin: 0; 
+    flex-shrink: 0; 
+}
+
 
 /* FÓRMULAS DETALHE (Conteúdo Nível 3) */
 .formula-content-details h3, .formula-content-details h2 {
@@ -355,10 +560,44 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     display: none !important; 
 }
 .formula-content-details .formula-pane {
-    /* Ajuste para remover o padding-bottom padrão */
+    /* Inicia escondido (será sobrescrito pelo .active abaixo) */
+    display: none !important;
     padding-bottom: 0; 
+    
+    /* NOVO: Configura o container para ROLAGEM HORIZONTAL */
+    flex-direction: row !important; 
+    flex-wrap: nowrap; 
+    overflow-x: auto !important; /* Mantém scroll horizontal */
+    overflow-y: hidden !important; /* Remove scroll vertical */
+    
+    align-items: flex-start; 
+    gap: 15px; /* Espaçamento entre os itens de fórmula na horizontal */
+    padding-top: 15px; 
+}
+.formula-content-details .formula-pane.active {
+    /* CRÍTICO: Configura o painel ativo de fórmulas para GRID 2xN horizontal */
+    display: grid !important; 
+    /* 2 linhas de 120px de altura */
+    grid-template-rows: 120px 120px; 
+    /* Colunas automáticas para cada item, sem quebras */
+    grid-auto-columns: 280px; 
+    grid-auto-flow: column; /* Faz com que os itens preencham horizontalmente */
+    
+    padding: 0;
+    gap: 15px; /* Espaçamento entre colunas/itens */
+    padding-top: 15px;
 }
 
+/* STRONG GUARD: Garantir que qualquer .formula-pane só seja visível
+   quando o container mestre #formula-content-area estiver ativo. Isso
+   evita que painéis de fórmula apareçam enquanto a aba Funções estiver ativa. */
+#formula-content-area .formula-pane { display: none !important; }
+#formula-content-area.active .formula-pane.active { display: grid !important; }
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 6: Estilos de Notação Matemática (Placeholders, Raiz, Fração) */
 /* === ÍCONES VISUAIS (Placeholder Quadrados) === */
 .square-placeholder {
@@ -386,7 +625,10 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 .root-symbol { font-family: serif; font-size: 1.1em; }
 
 
-/* Bloco 7: Estilos da Seção Editor (Card, Variáveis, Input)
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 7: Estilos da Seção Editor (Card, Variáveis, Input) */
 /* === EDITOR & INPUT (CORREÇÃO DE LAYOUT) === */
 .editor-section {
     display: flex;
@@ -513,6 +755,7 @@ h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
     border-radius: 0 0 var(--radius) var(--radius); /* Arredonda só embaixo */
     border: none; /* Borda movida para o .editor-section */
     box-shadow: none; /* Sombra movida para o .editor-section */
+    padding: 0;
     display: flex; flex-direction: column; gap: 0; 
     margin-top: 0; /* Remove a margem superior */
     position: relative; z-index: 3;
@@ -537,17 +780,17 @@ math-field {
     flex-grow: 1; 
     background: transparent; 
     border: none; 
-    font-size: 1.8rem; 
-    padding: 10px 0 0 0; 
-    padding-bottom: 40px; 
-    min-height: 50px; 
+    font-size: 1.25rem; 
+    padding: 8px 0 0 0; 
+    padding-bottom: 28px; 
+    min-height: 44px; 
     cursor: text; 
     color: var(--text-main);
     
     width: 100%; 
     box-sizing: border-box; 
 
-    margin-right: 20px; 
+    margin-right: 14px; 
     /* Esta linha é crucial para garantir que as fontes sejam aplicadas */
     font-family: 'KaTeX_Main', 'KaTeX_Math', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_Typewriter', serif !important;
 }
@@ -602,48 +845,49 @@ math-field:focus, math-field:focus-within { outline: none; }
 @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 
-/* CORREÇÃO CRÍTICA: Botões da Toolbar na gaveta NEXUS Library */
+/* Base styles for toolbar buttons (size/visual handled below) */
 .toolbar-group .toolbar-btn {
-    width: 100% !important;         /* Ocupa toda a célula do grid */
-    height: 70px !important;        /* Aumenta a altura dos botões */
-    font-size: 1.4rem !important;   /* Aumenta o tamanho dos símbolos */
+    aspect-ratio: 1 / 1 !important; /* keep square visual if needed */
+    font-size: 0.85rem !important;
     display: flex !important;
     align-items: center;
     justify-content: center;
-
     border: 1px solid var(--border);
     background: var(--bg-app);
     color: var(--text-main);
-    border-radius: 8px;
-    transition: all 0.2s;
+    border-radius: 6px;
+    transition: all 0.12s;
+    padding: 4px !important;
 }
 
+.toolbar-group .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-.toolbar-group .toolbar-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-/* Força 4 colunas no grupo de botões usando CSS Grid */
+/* AJUSTE: Layout de grupo de botões em até duas linhas horizontais */
 .toolbar-group {
-    /* ALTERAÇÃO CRÍTICA: Mudar de Flexbox para Grid */
-    display: grid;
-    /* Divide o espaço em 4 colunas iguais */
-    grid-template-columns: repeat(4, 1fr);
-    /* Mantido 10px de espaçamento */
-    gap: 10px; 
-    
-    /* Garantias de Layout */
-    /* CRÍTICO: Removendo width: 100% e margin: 0 */
-    
-    /* Remove a barra de rolagem horizontal se não for necessária */
-    overflow-x: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: flex;
+    flex-wrap: wrap; /* permite a segunda linha */
+    align-items: flex-start;
+    gap: 8px !important;
+
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    /* visual two-line layout; width is computed via JS per group */
 }
-.toolbar-group::-webkit-scrollbar {
-    display: none;
+
+/* Força botões a manterem dimensões consistentes para formar duas linhas visuais */
+.toolbar-group .toolbar-btn {
+    flex: 0 0 50px; /* REDUÇÃO: de 56px para 50px */
+    height: 50px; /* REDUÇÃO: de 56px para 50px */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
 }
-/* Fim da Correção Crítica da Toolbar */
+
+/* As regras de scrollbar do .toolbar-group são mantidas escondidas para limpeza visual */
+.toolbar-group::-webkit-scrollbar { display: none !important; }
 
 /* NOVO BLOCO DE ESTILO: CURSOR E ÁREA DE CLIQUE PARA ITENS DE FÓRMULA */
 .formula-item {
@@ -653,8 +897,21 @@ math-field:focus, math-field:focus-within { outline: none; }
     padding: 10px 15px;
     margin-bottom: 10px;
     transition: background 0.2s;
-    /* CRÍTICO (1): Adiciona o cursor de ação (mãozinha) ao item pai */
+    /* CRÍTICO: Garante o cursor de clique no contêiner */
     cursor: pointer; 
+    
+    /* NOVO: Define o tamanho do item para caber em duas linhas no scroll horizontal */
+    width: 280px; 
+    height: 120px; 
+    
+    margin: 0; 
+    
+    /* Garante o layout interno vertical */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: relative; /* allow absolute overlay to cover the whole card */
 }
 .formula-item:hover {
     background: rgba(59, 130, 246, 0.05);
@@ -671,16 +928,47 @@ math-field:focus, math-field:focus-within { outline: none; }
     padding: 0;
     width: 100%;
     
-    /* CORREÇÃO FINAL CRÍTICA: Neutraliza o comportamento de texto do MathLive */
-    /* Garante que o cursor do mouse não mude para text-bar */
-    cursor: pointer !important;
-    /* Impede que o componente MathLive capture o evento de clique */
-    pointer-events: none;
-    /* Remove a seleção de texto que pode estar causando a proteção de clique */
-    user-select: none;
+    /* CRÍTICO: Neutraliza o comportamento de edição do MathLive no read-only */
+    cursor: default !important; /* Anula o cursor text-bar do Shadow DOM do MathLive */
+    pointer-events: none !important; /* Permite que o clique passe para o contêiner .formula-item */
+    user-select: none !important;
 }
 
+/* Transparent overlay that captures pointer events to avoid selecting math-field internals */
+.formula-item .formula-overlay {
+    position: absolute;
+    inset: 0; /* top:0; right:0; bottom:0; left:0; */
+    z-index: 99999 !important;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto; /* overlay should capture the click */
+}
 
+/* ---------------------------------------------------------------------------------- */
+/* CRÍTICO: Configura os painéis de fórmula (level-2 panes) para o layout de 2 linhas em Grid. */
+.formula-content-details .formula-pane { 
+    /* Garante que o container interno do .formula-pane use Grid */
+    display: grid !important; 
+    /* 2 linhas de 120px de altura */
+    grid-template-rows: 120px 120px; 
+    /* Colunas automáticas para cada item, sem quebras */
+    grid-auto-columns: 280px; 
+    grid-auto-flow: column; /* Faz com que os itens preencham horizontalmente */
+    
+    /* Zera o padding e o gap originais para evitar conflitos de cálculo */
+    padding: 0;
+    gap: 15px; /* Espaçamento entre colunas/itens */
+    
+    /* Padding Top (Separador Visual) */
+    padding-top: 15px;
+}
+/* Garante que apenas o painel ativo seja exibido (o display none inicial ainda funciona) */
+.formula-content-details .formula-pane.active { display: grid !important; }
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 8: Estilos Rodapé Técnico e Resultado/Plotly */
 /* === RODAPÉ TÉCNICO (Códigos) === */
 .tech-footer {
@@ -707,8 +995,8 @@ math-field:focus, math-field:focus-within { outline: none; }
 }
 .result-card.hidden { display: none; }
 #result-output { 
-    font-size: 2.2rem; 
-    padding: 10px 0 20px 0; 
+    font-size: 1.6rem; 
+    padding: 8px 0 16px 0; 
     width: 100%; 
     pointer-events: none; 
     /* CRÍTICO: Garante que a saída use as fontes de renderização do MathLive/KaTeX */
@@ -733,6 +1021,9 @@ math-field:focus, math-field:focus-within { outline: none; }
 }
 
 
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 9: Estilos das Sidebars (Histórico e Memorial) */
 /* === SIDEBAR HISTÓRICO (Antigo Memória) === */
 .sidebar {
@@ -746,8 +1037,8 @@ math-field:focus, math-field:focus-within { outline: none; }
     padding: 25px;
     display: flex;
     flex-direction: column;
-    /* ALTERADO: Aumenta o Z-index para sobrepor o Memorial (1500) */
-    z-index: 1700; 
+    /* CRÍTICO: Z-index aumentado para 9000 para sobrepor o main-content */
+    z-index: 9000; 
     box-shadow: -5px 0 15px rgba(0,0,0,0.05);
     
     transform: translateX(100%);
@@ -769,7 +1060,7 @@ math-field:focus, math-field:focus-within { outline: none; }
     border-bottom: 1px solid var(--border);
 }
 .sidebar-header h2 {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-main);
     display: flex;
@@ -831,7 +1122,18 @@ math-field:focus, math-field:focus-within { outline: none; }
     opacity: 1;
 }
 
+/* REFORÇO CRÍTICO: Garantir que o container de rolagem da Library seja horizontal, não vertical */
+#library-content-scroll {
+    flex-grow: 1;
+    overflow-y: hidden; /* Remove o scroll vertical indesejado */
+    /* CORREÇÃO CRÍTICA: Remove o padding horizontal. O padding agora está em #toolbar-content-area */
+    padding: 0 0 20px 0; 
+}
 
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 10: Estilos do Memorial (Gaveta Esquerda) */
 /* === NOVO: TECLADO VIRTUAL FIXO === */
 #virtual-keyboard-container {
@@ -843,7 +1145,8 @@ math-field:focus, math-field:focus-within { outline: none; }
     max-height: 400px; 
     background-color: var(--bg-card);
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-    z-index: 3000; /* Z-Index 3000 para sobreposição garantida sobre o Memorial (1500) */
+    /* CRÍTICO: Aumenta o Z-Index para um valor dominante */
+    z-index: 99999; 
     /* Inicia escondido abaixo da tela */
     transform: translateY(100%); 
     transition: transform 0.3s ease-out;
@@ -863,6 +1166,9 @@ math-field:focus, math-field:focus-within { outline: none; }
 }
 
 
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 11: Estilos dos Toggles Flutuantes (Mobile) */
 /* Botão Flutuante para ABRIR o Teclado */
 .btn-fixed-bottom {
@@ -894,115 +1200,9 @@ math-field:focus, math-field:focus-within { outline: none; }
 }
 
 
-/* === SIDEBAR MEMORIAL (NOVO) - CORRIGIDO: Largura Fixa e Padding */
-.memorial-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 320px; /* Alterado de 100% para 320px (Largura da gaveta) */
-    height: 100vh;
-    background: var(--bg-sidebar);
-    padding: 0; /* Removido padding principal */
-    display: flex;
-    flex-direction: column;
-    z-index: 1500; 
-    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
-    
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.memorial-sidebar.open {
-    transform: translateX(0); 
-}
 
-/* Estrutura interna para as abas */
-.library-master-tabs {
-    padding: 0 20px; /* Adiciona padding horizontal */
-    margin-top: 15px; /* Espaçamento do cabeçalho */
-}
-
-.library-content-scroll {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 0 20px 20px 20px; /* Adiciona padding lateral e inferior */
-    
-}
-.library-detail-area {
-    width: 100%;
-    /* Desfaz o estilo do tab-content-area padrão para se adequar ao layout vertical da gaveta */
-    position: static; 
-    margin-top: 0;
-    border: none;
-    border-radius: var(--radius);
-    padding: 0;
-    box-shadow: none;
-    z-index: 1; 
-}
-
-
-/* ======================================================= */
-/* Botão Memorial (Gaveta Esquerda) - Ajustado o left na abertura */
-/* ======================================================= */
-#memorial-toggle {
-    position: fixed;
-    top: 50%;
-    left: 30px; /* Posição ajustada */
-    transform: translateY(-50%); 
-    
-    width: 32px;
-    height: 130px; 
-    writing-mode: vertical-rl;
-    font-weight: 600;
-    font-size: 1.1rem;
-    
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    
-    cursor: pointer;
-    z-index: 1001; 
-    
-    display: flex;
-    flex-direction: row; 
-    align-items: center;
-    justify-content: center;
-    gap: 5px; 
-    
-    color: var(--primary);
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, width 0.2s;
-}
-
-#memorial-toggle:hover {
-    background: var(--bg-app);
-    width: 35px;
-}
-#memorial-toggle span {
-    font-size: 1.8rem;
-    /* CORREÇÃO: Gira a seta para apontar para a direita (sentido de abertura) */
-    transform: rotate(90deg); 
-    transition: transform 0.3s ease-in-out;
-}
-
-/* Botão acompanha o Memorial quando abre (AGORA USANDO LARGURA FIXA 320PX) */
-.memorial-sidebar.open ~ #memorial-toggle {
-    left: 350px; /* 320px (Largura fixa) + 30px (padding/margem) */
-    transform: translateY(-50%) ; 
-}
-.memorial-sidebar.open ~ #memorial-toggle span {
-    transform: rotate(-90deg); /* Seta aponta para a esquerda (indicando fechar) */
-}
-
-
-/* Botão de Recolher Memorial (Canto Superior Direito da Gaveta) */
-#memorial-recolher {
-    /* Reusa estilos de btn-icon, mas posiciona-o */
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    z-index: 10;
-}
-
+/* ===============================================================================================*/
+/* ===============================================================================================*/
 /* Bloco 12: Media Queries (Responsividade) */
 /* === RESPONSIVIDADE === */
 
@@ -1016,52 +1216,52 @@ body.keyboard-open .main-content {
 /* --- ESTILOS DE TELA GRANDE (Widescreen > 1200px) --- */
 @media (min-width: 1201px) {
     /* Estado padrão: Ambas as gavetas abertas */
-    .memorial-sidebar:not(.override-close) {
-        transform: translateX(0);
-    }
     .sidebar:not(.override-close) {
         transform: translateX(0);
     }
     
-    /* Desloca o conteúdo principal para o centro */
+    /* Desloca o conteúdo principal: mantenha alinhado à esquerda; sidebars irão sobrepor */
     .main-content {
-        padding-left: 350px; /* 320px (Memorial) + 30px (padding) */
-        padding-right: 350px; /* 320px (Histórico) + 30px (padding) */
-        /* Garante que o Histórico e o Memorial toggles fiquem escondidos */
+        padding-left: 30px; /* minimal padding; sidebars overlay instead of pushing */
+        padding-right: 30px;
         z-index: 1; /* Abaixa o z-index do conteúdo principal */
     }
     
     /* Esconde os botões de toggle quando as gavetas estão abertas por padrão */
-    #sidebar-toggle, #memorial-toggle {
+    #sidebar-toggle, #nexus-toggle {
         display: none !important;
     }
+    
+    /* O BOTÃO DO TECLADO DEVE FICAR VISÍVEL (SEM DISPLAY: NONE) */
 }
 
 
 /* --- ESTILOS DE TELA MÉDIA (901px a 1200px) --- */
 @media (min-width: 901px) and (max-width: 1200px) {
-    /* Estado padrão: Histórico fechado, Memorial aberto */
-    .memorial-sidebar:not(.override-close) {
-        transform: translateX(0);
-    }
     .sidebar {
         transform: translateX(100%);
     }
     
     /* Desloca o conteúdo principal apenas pelo Memorial */
     .main-content {
-        padding-left: 350px; /* 320px (Memorial) + 30px (padding) */
-        padding-right: 60px; /* Histórico fechado, usa padding normal */
+        /* Keep minimal padding so sidebars overlay instead of pushing content */
+        padding-left: 30px;
+        padding-right: 30px;
     }
     
-    /* Toggle do Histórico visível; Toggle do Memorial escondido */
+    /* CRÍTICO: Ocultar o toggle Histórico em Tela Média IMEDIATAMENTE */
     #sidebar-toggle {
-        display: flex !important;
-        right: 30px; /* Posição normal */
-    }
-    #memorial-toggle {
         display: none !important;
+        right: 30px; 
     }
+    
+    /* NEXUS (esquerda) ficará recolhido em telas médias - exibe seu toggle */
+    #nexus-toggle {
+        display: flex !important;
+        left: 0px;
+    }
+    
+    /* O BOTÃO DO TECLADO DEVE FICAR VISÍVEL (SEM DISPLAY: NONE) */
 }
 
 
@@ -1073,7 +1273,7 @@ body.keyboard-open .main-content {
         height: 35px;
     }
     .tab-handle.active {
-        height: 34px;
+        height: 35px;
     }
     
     /* Garante que os toggles laterais sejam reposicionados */
@@ -1082,19 +1282,84 @@ body.keyboard-open .main-content {
         padding-left: 15px; 
     }
     #sidebar-toggle {
-        right: 15px; /* Ajusta para o padding de 15px do main-content */
+        /* CRÍTICO: Removido !important para permitir que o deslocamento para 335px funcione */
+        right: 15px; 
         display: flex !important; /* Visível por padrão */
     }
+    /* CORREÇÃO CRÍTICA: O Bloco 3 está agora controlando o deslocamento do toggle Histórico para 350px. Aqui ajustamos apenas o posicionamento em mobile */
     .sidebar.open ~ #sidebar-toggle {
         right: 335px; /* 320px (sidebar) + 15px (novo padding) */
     }
     
-    #memorial-toggle {
-        left: 15px; /* Ajusta para o padding de 15px do main-content */
-        z-index: 1600; 
-        display: flex !important; /* Visível por padrão */
+    /* NEXUS toggle - visível em mobile e ajustado para padding */
+    #nexus-toggle {
+        left: 15px; /* Ajustado para 15px de padding */
+        z-index: 1600;
+        display: flex !important;
     }
-    .memorial-sidebar.open ~ #memorial-toggle {
-        left: 335px; /* 320px (Largura fixa) + 15px (novo padding) */
+    .sidebar.left.open ~ #nexus-toggle {
+        left: 335px; /* 320px (sidebar) + 15px (novo padding) */
+    }
+
+    /* Small screens: center the main content and keep sidebars as overlay drawers */
+    .main-content {
+        padding-left: 15px;
+        padding-right: 15px;
+        align-items: center; /* center children horizontally */
+    }
+    /* CORREÇÃO CRÍTICA: Permite que o conteúdo ocupe a largura total do container */
+    .main-content > * {
+        max-width: 100%; /* ALTERADO DE 1000px PARA 100% */
+        width: 100%; /* ALTERADO DE auto PARA 100% */
+        margin-left: auto;
+        margin-right: auto;
     }
 }
+
+/* When Nexus is visible in desktop (non-drawer) mode, shift content to sit to the right of Nexus */
+body.nexus-visible .main-content {
+    padding-left: 350px; /* 320px Nexus width + 30px spacing */
+}
+
+/* CORREÇÃO CRÍTICA: Permite o empurrão do NEXUS APENAS em Widescreen ( > 1200px) */
+/* Caso contrário, ele é um overlay/fechado e não deve ter padding de empurrão. */
+@media (max-width: 1200px) {
+    body.nexus-visible .main-content {
+        padding-left: 30px; /* Retorna ao padding normal (ou 15px em mobile) */
+    }
+}
+
+
+/* When right sidebar (Histórico) is visible on large screens, shift content right padding */
+body.sidebar-visible .main-content {
+    padding-right: 350px; /* 320px sidebar width + 30px spacing */
+}
+
+/* CORREÇÃO CRÍTICA: Remove o padding de deslocamento para Histórico APENAS em Mobile (<= 900px). 
+   Em Tablet (901px-1200px), a sidebar está fixa e DEVE empurrar o conteúdo com 350px. */
+@media (max-width: 900px) { 
+    body.sidebar-visible .main-content {
+        padding-right: 15px; /* Retorna ao padding base do mobile */
+    }
+}
+
+
+/* When both sidebars are visible, center content between them by applying both paddings */
+body.nexus-visible.sidebar-visible .main-content {
+    padding-left: 350px;
+    padding-right: 350px;
+}
+
+/* NOVO: Corrige o padding-left/right da regra acima para mobile/tablet */
+/* CRÍTICO: Em Tablet (901px-1200px), a sidebar NEXUS é fechada (nexus-visible é FALSE). 
+   Esta regra só é relevante se ambas estiverem ativas, o que só ocorre em WIDESCREEN ou (por um bug) em Mobile. */
+@media (max-width: 1200px) {
+    body.nexus-visible.sidebar-visible .main-content {
+        padding-left: 30px; 
+        padding-right: 30px; 
+    }
+}
+
+
+/* Adjust sidebar toggle positions when both visible */
+body.sidebar-visible #sidebar-toggle { right: 370px; }
