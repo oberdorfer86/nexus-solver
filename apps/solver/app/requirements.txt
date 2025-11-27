@@ -1,0 +1,8 @@
+# Bloco 1: Dependências Python do Micro-app Solver (Base)
+# -----
+fastapi
+uvicorn
+jinja2
+sympy
+numpy # CRÍTICO: Adicionado para suportar a função generate_plot_data e cálculos avançados
+# -----

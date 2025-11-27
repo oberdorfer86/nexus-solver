@@ -1,12 +1,18 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  web:
-    # container_name: calculadora_web_service  <-- REMOVIDO propositalmente para permitir múltiplas versões (v1, v2)
-    build: .
+  nexus-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexus-web
+    env_file: .env # Novo: Mapeamento para o arquivo de variáveis de ambiente
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/code/app
-    # O comando abaixo ativa o modo de desenvolvimento com reload automático
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - ./apps:/code/apps
+      - ./shared-lib:/code/shared-lib
+      - ./tools:/code/tools
+    # environment:
+    #   - ENV=production # Removido, agora está no .env
+    restart: unless-stopped

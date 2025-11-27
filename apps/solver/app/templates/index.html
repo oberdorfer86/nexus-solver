@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link data-nexus-block="1:Estilos Locais (CSS)" rel="stylesheet" href="{{ url_for('solver_static', path='css/style.css') }}?v=8.4">
+<link rel="stylesheet" href="{{ url_for('functions_panel_static', path='style.css') }}?v=1.0">
+<style>
+/* Padding dinâmico do micro-app */
+.solver-page {
+    /* CRÍTICO: Removendo padding fixo e transições. O espaçamento é herdado do .main-content. */
+    padding-left: 0;
+    padding-right: 0;
+    transition: none;
+}
+
+/* Removido media query de 1200px (não é mais necessário) */
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+{% block content %}
+<div class="solver-page" data-nexus-block="2:Conteudo Principal (Micro-App)">
+    
+    <div class="main-content-wrapper">
+
+        <div class="tabs-container">
+            <div class="tab-controls" id="tab-controls-container">
+                <div class="tab-handle active" data-tab="toolbar-content-area" id="toolbar-main">
+                    <span class="material-icons-round">apps</span> Funções
+                </div>
+                <div class="tab-handle" data-tab="formula-content-area" id="formula-container">
+                    <span class="material-icons-round">description</span> Fórmulas
+                </div>
+            </div>
+
+            <div class="tab-content-area">
+                <div class="tab-pane active" id="toolbar-content-area">
+                    {% include 'components/toolbar_panel.html' %}
+                </div>
+                <div class="tab-pane" id="formula-content-area">
+                    {% include 'components/formula_panel.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="input-actions-block">
+            <div class="input-group">
+                <input type="text" id="calc-label" placeholder="Nomeie este cálculo (ex: Momento Máximo)...">
+            </div>
+
+            <div class="input-group unified-input-wrapper">
+                <label for="math-editor" class="sr-only">Digite sua expressão</label>
+                <math-field id="math-editor" virtual-keyboard-mode="manual" 
+                           class="mf-initial"
+                           placeholder="Digite sua expressão..."
+                           data-nexus-block="3:Campo de Expressão MathLive">
+                </math-field>
+                <button id="keyboard-toggle" class="icon-btn keyboard-toggle-btn" title="Alternar Teclado Virtual" aria-label="Alternar Teclado Virtual">
+                    <span class="material-icons-round">keyboard</span>
+                </button>
+            </div>
+            
+            <div class="button-group-bottom">
+                <button id="clear-btn" class="btn btn-red icon-btn-text">
+                    <span class="material-icons-round">delete</span> Limpar
+                </button>
+                <button id="calculate-btn" class="btn btn-primary icon-btn-text">
+                    <span class="material-icons-round calculate-icon">calculate</span> Calcular
+                </button>
+            </div>
+
+
+            <div class="codes-toggle-section">
+                <button class="btn btn-secondary icon-btn-text" id="toggle-codes-btn">
+                    <span class="material-icons-round">code</span> Ver Códigos (Excel / LaTeX)
+                </button>
+                <div class="codes-output-area hidden" id="codes-output-area">
+                    <div class="input-group">
+                        <label for="excel-code">Excel</label>
+                        <textarea id="excel-code" readonly></textarea>
+                        <button class="copy-btn" data-target="excel-code">Copiar</button>
+                    </div>
+                    <div class="input-group">
+                        <label for="latex-code">LaTeX</label>
+                        <textarea id="latex-code" readonly></textarea>
+                        <button class="copy-btn" data-target="latex-code">Copiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-area hidden" id="result-area">
+            <h2>Resultado</h2>
+            <div class="input-group">
+                <label for="result-output" class="sr-only">Resultado</label>
+                <math-field id="result-output" readonly data-nexus-block="4:Campo de Resultado MathLive"></math-field>
+            </div>
+            <div id="plot-container" style="display: none; width: 100%; height: 400px; margin-top: 15px;">
+                <div id="plotly-graph" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="virtual-keyboard-container" class="virtual-keyboard-container">
+        </div>
+
+    <div id="history-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Histórico</h3>
+            <button id="clear-history-btn" class="btn btn-sm btn-secondary">Limpar Tudo</button>
+        </div>
+        <ul id="history-list" class="history-list">
+            </ul>
+    </div>
+
+</div>
+{% endblock %}
+
+
+
+
+
+<div class="toolbar-content" data-nexus-block="3:Conteudo da Toolbar (Funções)">
+    
+    <div class="category-nav">
+        </div>
+    
+    <div class="toolbar-pane active" id="pane-basico" data-name="BÁSICO">
+        <div class="toolbar-section-title">Funções Básicas</div>
+        <div class="toolbar-group" data-group-name="Operadores">
+            <button class="toolbar-btn" data-latex="+" title="Adição">+</button>
+            <button class="toolbar-btn" data-latex="*" title="Multiplicação">*</button>
+            <button class="toolbar-btn" data-latex="\frac{\square}{\square}" title="Fração (Divisão)">
+                <span class="fraction-icon">
+                    <span class="square-placeholder small"></span>
+                    <span class="fraction-line"></span>
+                    <span class="square-placeholder small sub"></span>
+                </span>
+            </button>
+            <button class="toolbar-btn" data-latex="/" title="Divisão">/</button>
+            <button class="toolbar-btn" data-latex="\Delta" title="Variação Delta">&Delta;</button>
+        </div>
+        
+        <div class="toolbar-group" data-group-name="Constantes">
+            <button class="toolbar-btn" data-latex="-" title="Subtração">-</button>
+            <button class="toolbar-btn" data-latex="()" title="Parênteses">()</button>
+            <button class="toolbar-btn" data-latex="\pi" title="Pi">&pi;</button>
+            <button class="toolbar-btn" data-latex="=" title="Igualdade">=</button>
+            <button class="toolbar-btn" data-latex="e" title="Euler">e</button>
+            <button class="toolbar-btn" data-latex="\infty" title="Infinito">&infin;</button>
+        </div>
+        
+        </div>
+    
+</div>

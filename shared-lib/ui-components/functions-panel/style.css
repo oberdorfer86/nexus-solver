@@ -1,0 +1,397 @@
+/* Bloco 1: Reset e Container Principal */
+
+/* Estilos globais de reset/box-sizing para o componente */
+.functions-panel-container * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container principal com bordas arredondadas (conforme imagem) */
+#functions-panel-container {
+    /* CORREÇÃO CRÍTICA: Removendo background fixo para herdar do pai e usar o tema escuro. */
+    /* background-color: #f8f9fa; <-- REMOVIDO */
+    border: 0; 
+    border-radius: 0 0 12px 12px; /* Mantém arredondamento APENAS nas partes inferiores */
+    width: 100%; /* ALTERADO para 100% para evitar scrollbar dupla e usar padding do .editor-section */
+    max-width: 1180px; /* Herdar max-width do .main-content > * */
+    margin: 0 auto; /* Centraliza */
+    padding: 0; /* Remove padding que causava desalinhamento */ 
+    overflow: hidden; 
+}
+
+/* CORREÇÃO CRÍTICA PARA ÍCONES: Garante que a fonte Material Icons seja aplicada */
+.material-icons-round {
+    font-family: 'Material Icons Round';
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    /* Opções de compatibilidade */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+
+
+
+
+
+
+/* Bloco 2: Estilos de Abas e Headers (Tabs) */
+
+/* Estilização da barra de abas (Tabs Header) */
+.tabs-header {
+    display: flex;
+    overflow-x: auto; 
+    border-bottom: 1px solid var(--border); /* Token Global */
+    background-color: var(--bg-card); /* Token Global */
+}
+
+/* Estilo individual do botão da aba */
+.tab-button {
+    flex-shrink: 0; 
+    padding: 10px 15px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-main); /* Token Global */
+    transition: all 0.2s ease;
+    border-radius: 0;
+}
+
+/* Estilo específico para o cabeçalho principal (Funções | Fórmulas) */
+.main-tabs-header {
+    background-color: var(--bg-card); /* Token Global */
+    border-bottom: 1px solid var(--border); /* Token Global */
+    padding: 0; 
+}
+
+.main-tabs-header .tab-button {
+    /* ... estilos de layout ... */
+    
+    border-bottom: none; 
+    background-color: var(--bg-app); /* Token Global */
+    border: 1px solid var(--border); /* Token Global */
+    border-bottom: none; 
+    border-radius: 8px 8px 0 0;
+    color: var(--text-main); /* Token Global */
+    /* ... */
+    z-index: 2;
+}
+
+/* O primeiro botão principal */
+.main-tabs-header .tab-button:first-child {
+    /* ... */
+    border-left: 1px solid var(--border); /* Token Global */
+    z-index: 3;
+    border-top-left-radius: 8px;
+}
+
+/* O último botão deve fechar o contorno do lado direito */
+.main-tabs-header .tab-button:last-child {
+    border-right: 1px solid var(--border); /* Token Global */
+    margin-right: 0; 
+}
+
+
+/* Estilo para o Header das Sub-abas */
+.sub-tabs-header, .formula-sub-tabs-header {
+    padding: 0px 15px; 
+    white-space: nowrap; 
+    background-color: var(--bg-card); /* Token Global */
+    border-bottom: none;
+}
+.sub-tabs-header .tab-button, .formula-sub-tabs-header .tab-button {
+    border: 1px solid var(--border); /* Token Global */
+    border-radius: 8px;
+    background-color: var(--bg-card); /* Token Global */
+    color: var(--text-main); /* Token Global */
+    /* ... */
+}
+
+
+/* Estilo da aba ativa */
+.tab-button.active {
+    background-color: var(--bg-card); /* Mantido BG do card */
+    color: var(--primary); /* Token Global */
+    font-weight: bold;
+    border-bottom: 3px solid var(--primary); /* Token Global */
+}
+
+/* Ajuste para abas principais ATIVAS (Funções/Fórmulas) */
+.main-tabs-header .tab-button.active {
+    background-color: var(--bg-card); /* Token Global */
+    color: var(--primary); /* Token Global */
+    border-color: var(--border); /* Token Global */
+    border-bottom: 1px solid var(--bg-card); /* CRÍTICO: Usa cor de fundo para "apagar" a borda */
+    font-weight: 700;
+}
+
+.tab-button:hover:not(.active) {
+    background-color: var(--bg-app); /* Token Global */
+}
+
+/* Novo estilo para as Sub-abas Ativas (Funções e Fórmulas) */
+.sub-tabs-header .tab-button.active, .formula-sub-tabs-header .tab-button.active {
+    background-color: var(--primary); /* Token Global */
+    color: var(--bg-card); /* Token Global (branco ou escuro) */
+    border-color: var(--primary); /* Token Global */
+    border-bottom: 1px solid var(--primary);
+}
+
+/* CRÍTICO: Aplica borda ao redor do CONTEÚDO principal */
+.main-tabs-content {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0 0 12px 12px;
+    padding: 0;
+}
+
+/* Estilo do painel de conteúdo (Tab Pane) */
+.tab-pane {
+    display: none;
+    padding: 15px 15px; 
+    overflow-x: auto; 
+    overflow-y: hidden; 
+    background-color: var(--bg-card); /* Token Global */
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* --- Lógica de Sobrescrita para Tema DARK --- */
+
+html[data-theme="dark"] .main-tabs-header .tab-button {
+    /* No tema escuro, o botão fica mais escuro que o background do app */
+    background-color: var(--bg-sidebar); 
+    color: var(--text-main);
+}
+
+html[data-theme="dark"] .main-tabs-header .tab-button.active {
+    /* A aba ativa deve ter o mesmo fundo do conteúdo (bg-card/sidebar) */
+    background-color: var(--bg-card); 
+    border-bottom: 1px solid var(--bg-card);
+}
+
+
+
+
+
+
+
+
+/* Bloco 3: Estilos dos Botões de Função (func-btn) */
+
+/* Estilização dos botões (Funções e Fórmulas) */
+.func-btn, .formula-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px; /* Bordas arredondadas nos botões */
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.1s;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color 0.1s;
+    user-select: none;
+}
+
+.func-btn {
+    background-color: var(--bg-card); /* Token Global */
+    color: var(--text-main); /* Token Global */
+    border: 1px solid var(--border); /* Token Global */    
+
+    /* Tamanho FIXO de 44px x 44px para layout grid */
+    min-height: 44px;
+    min-width: 44px;
+    height: 44px;
+    width: 44px;
+    padding: 2px; /* Padding reduzido para caber o conteúdo */
+    flex-shrink: 0;
+    display: flex; /* Alterado para flex para melhor alinhamento interno */
+}
+
+/* Ensure KaTeX output inside func-btn is centered and scales */
+.func-btn .func-render {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap; /* manter a fórmula em uma única linha dentro do botão */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    font-size: 0.95rem; /* reduz levemente para caber melhor */
+    /* Escala reduzida para compensar o sobrescrito e a altura da fonte KaTeX */
+    transform: scale(0.85);
+    transform-origin: center center;
+}
+
+/* Ajuste específico para o HTML gerado pelo KaTeX */
+.func-btn .katex {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.func-btn:hover {
+    background-color: var(--bg-app); /* Usa cor do fundo do app para contraste no hover */
+}
+
+/* Layout dos botões matemáticos (Grid 2xN) */
+.functions-grid {
+    display: grid;
+    /* CRÍTICO: Define EXATAMENTE 2 linhas de 44px de altura + 8px de gap */
+    grid-template-rows: 44px 44px; 
+    /* CRÍTICO: Força o fluxo a ser horizontal (colunas) */
+    grid-auto-flow: column; 
+    /* Define a largura das colunas criadas automaticamente */
+    grid-auto-columns: 44px; 
+    /* Garante que o grid ultrapasse o pai para ativar o scroll */
+    width: max-content; 
+    
+    gap: 8px; /* Espaçamento entre os botões */
+    align-items: center;
+    
+    /* Adiciona padding inferior para a scrollbar não sobrepor o gap do último item */
+    padding-bottom: 8px; 
+}
+
+/* Estilo especial para a fração (botão de divisão com barra) */
+.fraction-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.fraction-icon hr {
+    width: 100%;
+    margin: 0;
+    border: 0.5px solid var(--text-main); /* Token Global */
+}
+
+
+
+
+
+
+
+/* Bloco 4: Estilos dos Botões de Fórmula (formula-btn) */
+
+/* Estilos para a seção de Fórmulas Comuns */
+.formula-pane h3 {
+    font-size: 1.1rem;
+    color: #495057;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.formula-btn {
+    /* Estilo de Cartão (Card) para o botão de Fórmula */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    
+    /* Visual de Card */
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #dee2e6; /* Borda leve */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+    
+    /* Removido padding 8px 15px e margin-bottom 8px */
+    padding: 15px; /* Preenchimento interno do card */
+    margin-bottom: 0; /* O gap do grid cuidará do espaçamento */
+    
+    /* Garantir que o botão ocupe o espaço do grid, mas seja responsivo */
+    width: 100%;
+    min-height: 120px;
+    
+    transition: all 0.2s ease;
+}
+
+.formula-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff; /* Borda azul ao passar o mouse */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Eleva o cartão verticalmente no hover */
+    transform: translateY(-3px);
+}
+
+.formula-btn .formula-title {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 8px; /* Espaço entre o título e a fórmula */
+}
+
+/* Garante que a fórmula renderizada (KaTeX) seja o foco visual */
+.formula-btn .formula-render {
+    font-size: 1.0rem; /* ALTERADO DE 1.2rem - Reduz tamanho da fórmula */
+    font-weight: normal;
+}
+
+/* Layout de sub-panes de fórmulas: duas linhas, fluxo horizontal com rolagem */
+.formula-sub-pane {
+    /* CRÍTICO: Reverte o padding horizontal para 30px */
+    padding: 12px 30px 18px 30px; 
+    overflow-x: auto; /* rolagem horizontal quando necessário */
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Container que organiza as fórmulas em DUAS LINHAS HORIZONTAIS */
+.formula-strip {
+    display: grid;
+    /* CRÍTICO: Define EXATAMENTE 2 linhas de 120px de altura (altura do card) */
+    grid-template-rows: 120px 120px; 
+    /* CRÍTICO: Faz o conteúdo fluir HORIZONTALMENTE (colunas) */
+    grid-auto-flow: column; 
+    /* Define a largura das colunas criadas automaticamente (largura dos cards, assumindo 280px) */
+    grid-auto-columns: 280px; 
+    /* Garante que o grid ultrapasse o pai para ativar o scroll */
+    width: max-content; 
+    
+    gap: 16px; /* Espaçamento entre os cartões (vertical e horizontal) */
+    /* Garante que o transform funcione (impede o stretch vertical que o anula) */
+    align-items: flex-start; 
+}
+
+/* Botões dentro do strip (compactos e com largura automática) - Esta regra está agora redundante */
+.formula-strip .formula-btn {
+    min-width: 160px;
+}
+
+
+
+
+
+
+
+/* Bloco 5: Estilos de Scrollbar */
+
+/* Força a exibição do scroll bar visível quando houver overflow */
+.formula-sub-pane::-webkit-scrollbar {
+    height: 10px;
+}
+.formula-sub-pane::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 6px;
+}

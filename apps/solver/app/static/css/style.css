@@ -1,0 +1,1483 @@
+/* Bloco 1: Variáveis, Reset e Configuração Dark Mode */
+:root {
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Cores NEXUS (Light) */
+    --bg-app: #f3f4f6;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    
+    /* Azul Tech para a marca NEXUS */
+    --primary: #3b82f6; 
+    --primary-hover: #2563eb;
+    
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    
+    --danger: #ef4444;
+    --danger-light: #fef2fef;
+}
+
+html[data-theme="dark"] {
+    --bg-app: #111827;
+    --bg-card: #1f2937;
+    --bg-sidebar: #1f2937;
+    
+    /* Azul Neon/Ciano para Dark Mode */
+    --primary: #0ea5e9;
+    --primary-hover: #38bdf8;
+    
+    --text-main: #f9fafb;
+    --text-muted: #9ca3af;
+    --border: #374151;
+    
+    --danger: #f87171;
+    --danger-light: #450a0a;
+}
+
+/* Reset Global */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-sans); 
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden; 
+}
+
+/* Slightly smaller base font for a more compact, professional look */
+html { font-size: 15px; }
+
+
+
+/* Bloco 12: Media Queries (Responsividade) */
+/* === RESPONSIVIDADE === */
+
+/* ... (outras regras) ... */
+
+
+/* --- ESTILOS DE TELA MÉDIA (901px a 1200px) --- */
+@media (min-width: 901px) and (max-width: 1200px) {
+    /* ... (outras regras) ... */
+    
+    /* NEXUS (esquerda) ficará recolhido em telas médias - exibe seu toggle */
+    #nexus-toggle {
+        display: flex !important;
+        left: 0px;
+    }
+    
+    /* NOVO/CRÍTICO: Remove o padding de deslocamento que era aplicado no TABLET */
+    body.sidebar-visible .main-content {
+        padding-right: 30px; /* Volta ao padding normal */
+    }
+    
+    /* NOVO/CRÍTICO: Garante que o conteúdo fique alinhado à esquerda na área disponível (sem ser centralizado) */
+    .main-content {
+        align-items: stretch; 
+    }
+    .main-content > * {
+        max-width: 100%; 
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+
+/* ... (outras regras) ... */
+
+/* When right sidebar (Histórico) is visible on large screens, shift content right padding */
+@media (min-width: 1201px) {
+    body.sidebar-visible .main-content {
+        padding-right: 350px; /* 320px sidebar width + 30px spacing */
+    }
+}
+
+
+/* When both sidebars are visible, center content between them by applying both paddings */
+body.nexus-visible.sidebar-visible .main-content {
+    padding-left: 350px;
+    padding-right: 350px;
+}
+
+/* CORREÇÃO CRÍTICA: Remove o padding-left/right da regra acima para mobile/tablet. 
+   Já que removemos a sidebar-visible no Tablet, esta regra não deve ser estritamente necessária, mas é uma proteção. */
+@media (max-width: 1200px) {
+    body.nexus-visible.sidebar-visible .main-content {
+        padding-left: 30px; 
+        padding-right: 30px; 
+    }
+}
+
+
+
+
+/* Bloco 3: Sidebar Histórico (Direita) */
+/* Sidebar Histórico (Antigo Memória) */
+.sidebar {
+    position: fixed;
+    top: 0;
+    /* REMOVIDO: right: 0; (Movido para .sidebar:not(.left)) */
+    /* REMOVIDO: width: 320px; (Movido para .sidebar:not(.left)) */
+    height: 100vh;
+    background: var(--bg-sidebar);
+    /* REMOVIDO: border-left: 1px solid var(--border); (Movido para .sidebar:not(.left)) */
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    /* ALTERADO: Aumenta o Z-index para sobrepor o Memorial (1500) */
+    z-index: 1700; 
+    /* REMOVIDO: box-shadow: -5px 0 15px rgba(0,0,0,0.05); (Movido para .sidebar:not(.left)) */
+    
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* NOVO: Aplica propriedades de Histórico (Direita/Largura Fixa) APENAS para sidebars que NÃO são a da esquerda */
+.sidebar:not(.left) {
+    width: 320px;
+    right: 0;
+    border-left: 1px solid var(--border);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+}
+
+.sidebar.open {
+    transform: translateX(0); 
+}
+
+/* Left-side variant for NEXUS */
+.sidebar.left {
+    left: 0;
+    right: auto;
+    /* CRÍTICO: Força a largura correta do shell (250px) para anular herança indevida */
+    /* Garantindo que o valor do core.css seja usado com alta prioridade */
+    width: var(--sidebar-width, 250px) !important; 
+    border-left: none;
+    border-right: 1px solid var(--border);
+    box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+    z-index: 1700; /* Garante que o NEXUS também tenha alto Z-index */
+    transform: translateX(-100%);
+}
+.sidebar.left.open {
+    transform: translateX(0);
+}
+
+/* ======================================================= */
+/* REPOSICIONAMENTO: Botão Histórico (Gaveta Direita) */
+/* ======================================================= */
+#sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    /* POSIÇÃO FIXA: 0px à direita + 30px de padding do main-content */
+    right: 30px; 
+    transform: translateY(-50%);
+    
+    /* DIMENSÕES E ESTILO PARA O TEXTO VERTICAL */
+    width: 32px;
+    height: 130px; 
+    writing-mode: vertical-rl;
+    font-weight: 600;
+    font-size: 1.1rem;
+    
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px; /* Borda completa */
+    box-shadow: var(--shadow);
+    
+    cursor: pointer;
+    /* ALTERADO: Ajusta o Z-index para ficar acima da própria gaveta Histórico (1700) */
+    z-index: 1800; 
+    
+    /* Alinhamento Icone + Texto */
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    justify-content: center;
+    gap: 5px; 
+    
+    color: var(--primary);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, width 0.2s;
+}
+
+#sidebar-toggle:hover {
+    background: var(--bg-app);
+    width: 35px;
+}
+#sidebar-toggle span {
+    font-size: 1.4rem; 
+    /* Gira a seta para apontar para a esquerda (sentido de abertura) */
+    transform: rotate(-90deg); 
+    transition: transform 0.3s ease-in-out;
+}
+
+
+/* Botão acompanha a sidebar quando abre (Desloca para a esquerda) */
+.sidebar.open ~ #sidebar-toggle {
+    right: 350px; /* 320px (sidebar) + 30px (padding/margem) */
+}
+.sidebar.open ~ #sidebar-toggle span {
+    /* Seta aponta para a direita (indicando fechar) */
+    transform: rotate(90deg);
+}
+
+/* Toggle do NEXUS (esquerda) - espelha o estilo do histórico */
+#nexus-toggle {
+    position: fixed;
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 130px;
+    writing-mode: vertical-rl;
+    font-weight: 600;
+    font-size: 1.1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    z-index: 1800;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: var(--primary);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, width 0.2s;
+}
+#nexus-toggle:hover { background: var(--bg-app); width: 35px; }
+#nexus-toggle span { font-size: 1.4rem; transform: rotate(-90deg); transition: transform 0.3s ease-in-out; }
+
+/* Move toggle quando o painel NEXUS abrir (usa 250px do core + 30px de padding) */
+.sidebar.left.open ~ #nexus-toggle { left: 280px; }
+.sidebar.left.open ~ #nexus-toggle span { transform: rotate(90deg); }
+
+/* NOVO: Classe para ocultar os toggles em mobile quando o teclado ou outra gaveta está aberta */
+/* Também esconde os toggles por padrão em desktop, confiando no JS para mostrá-los/escondê-los */
+/* #memorial-toggle.hidden REMOVIDO */
+#sidebar-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+/* Nova classe para forçar o botão a desaparecer em breakpoints específicos */
+.toggle-hidden {
+    display: none !important;
+}
+
+
+
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 4: Estilos Gerais (Header, Título) */
+/* === HEADER & LOGO === */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px; /* ALTERADO: Reduzido de 25px para 15px */
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+}
+ h1 { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+
+/* Top-mounted Library (moved from left column) */
+.top-library {
+    width: 100%;
+    background: transparent;
+    margin-bottom: 8px;
+    display: block;
+    position: relative;
+    z-index: 1600; /* Above most content but below floating toggles */
+}
+.top-library .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 8px 0; /* ALTERADO: Removido o padding top de 6px */
+}
+.top-library #tab-controls-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.top-library #tab-content-area {
+    margin-top: 0;
+    padding: 12px;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* Make the tab handles smaller and horizontally flowing for top bar */
+.top-library .tab-handle { height: 38px; width: auto; padding: 0 12px; }
+
+/* On small screens, collapse the top library to a full-width stacked block */
+@media (max-width: 900px) {
+    .top-library { padding: 8px 0; }
+    .top-library #tab-controls-container { overflow-x: auto; }
+    .top-library #tab-content-area { padding: 10px; }
+}
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 5: Estilos da Toolbar/Abas de Navegação (Master-Detail) */
+/* === TOOLBAR (Horizontal Fix) === */
+#tab-controls-container {
+    /* Container para posicionar as abas LADO A LADO FIXAS */
+    display: flex;
+    gap: 5px;
+    margin-bottom: 0; /* Remove a margem para colar no conteúdo */
+    z-index: 10; 
+}
+
+/* Estilo Base para as Abas (Handles) */
+.tab-handle {
+    position: relative; /* Mantém no fluxo normal */
+    height: 36px; 
+    width: 160px; /* AJUSTED: slightly narrower handles */
+    padding: 0 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 15; /* Alto Z-index para flutuar */
+}
+/* Estilo para o Título do Handle */
+.tab-handle .handle-title, .tab-handle h2 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+/* ABA INATIVA - Fica atrás, com borda escura */
+.tab-handle.inactive {
+    z-index: 10;
+    border-color: var(--border);
+    color: var(--text-muted);
+    background: var(--bg-app); /* Fundo mais escuro */
+}
+/* Aba inativa quando hover */
+.tab-handle.inactive:hover {
+    background: var(--bg-card);
+    color: var(--primary);
+}
+
+/* ABA ATIVA - Fica na frente, com borda clara, e "corta" a borda de baixo */
+.tab-handle.active {
+    z-index: 20;
+    border-color: var(--border);
+    color: var(--primary);
+    background: var(--bg-card);
+    /* Keep active/inactive box model identical to avoid layout shift */
+    margin-top: 0;
+    height: 36px;
+    padding-left: 1px;
+    padding-right: 1px;
+    /* Use a subtle inner highlight instead of changing size */
+    box-shadow: inset 0 -3px 0 0 rgba(59,130,246,0.08);
+}
+
+/* ---------------------------------------------------- */
+/* Lógica de Conteúdo Compartilhado */
+/* ---------------------------------------------------- */
+
+#tab-content-area {
+    /* Reposiciona o conteúdo para cobrir a área abaixo das abas */
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-top: -1px; /* CRÍTICO: Cola na aba ativa */
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0 var(--radius) var(--radius) var(--radius); /* Arredonda todos, exceto canto superior esquerdo para dar espaço para o handle */
+    /* CORREÇÃO CRÍTICA: Remove o padding principal. O padding será aplicado dentro dos painéis (.toolbar-content) */
+    padding: 0; 
+    box-shadow: var(--shadow);
+    z-index: 1; /* Fica abaixo dos handles */
+    /* NOVO: Adiciona overflow hidden para isolar o conteúdo interno */
+    overflow: hidden; 
+}
+
+/* CORREÇÃO CRÍTICA: As abas mestras devem ser display: block ou display: none */
+.tab-pane { 
+    /* CRÍTICO: Garante que as abas inativas sejam escondidas */
+    display: none !important; 
+    /* NOVO: Adiciona altura automática para o conteúdo */
+    height: auto; 
+} 
+.tab-pane.active { 
+    /* CRÍTICO: As abas ativas são blocos que definem o layout do seu conteúdo */
+    display: block !important; 
+}
+
+/* NOVO: Estilo para os Títulos de Seção de Funções/Fórmulas */
+.toolbar-section-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    background-color: var(--bg-app);
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+/* Garante que o conteúdo da aba Funções/Fórmulas flua verticalmente */
+#toolbar-content-area .toolbar-content, #formula-content-area {
+    display: block !important; 
+    padding-top: 0;
+    /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
+    padding: 0 2px 2px 2px; 
+}
+    /* By default category panes are hidden; JS will show the selected category pane */
+    #toolbar-content-area .toolbar-pane, #formula-content-area .formula-pane {
+        display: none;
+        padding: 0; /* Remove padding desnecessário */
+    }
+
+
+/* NÍVEL 2: CATEGORIAS (Navegação Master-Detail REMOVIDA) */
+.toolbar-tabs, .formula-category-list {
+    /* Oculta as listas de navegação verticais de ambas as abas */
+    display: none; 
+    flex-wrap: wrap; 
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+    /* Category navigation (level-2 titles transformed into tabs) */
+    .category-nav {
+        display: flex;
+        gap: 1px;
+        align-items: center;
+        padding: 4px 3px;
+        overflow-x: auto;
+        margin-bottom: 12px;
+    }
+    .category-nav .cat-btn {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--text-main);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .category-nav .cat-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    @media (max-width: 900px) {
+        .category-nav { padding: 6px 0; }
+        .category-nav .cat-btn { padding: 6px 10px; }
+    }
+
+    /* Smaller button sizing specifically for formula panes - ESTA REGRA FOI REMOVIDA 
+       para que todos os botões usem a nova dimensão de 48px do Bloco 7 */
+    
+/* NÍVEL 3: COMANDOS DE CÁLCULO (Agrupamento Vertical) */
+
+.toolbar-pane > div, .formula-content-details { 
+    /* Container que contém todos os grupos (Deve ser VERTICAL) */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaçamento entre grupos de botões */
+    padding-top: 5px; /* Reduzido o padding top */
+}
+
+/* CORREÇÃO CRÍTICA: Configura o toolbar-pane para layout horizontal rolável (Funções) */
+.toolbar-pane {
+    display: none !important; /* Inicia todos os painéis de categoria como escondidos */
+    flex-direction: row !important; /* Define a direção flexível para quando for ativado */
+    flex-wrap: nowrap; 
+    overflow-x: auto !important; /* Mantém scroll horizontal */
+    overflow-y: hidden !important; /* CRÍTICO: Remove forçadamente scroll vertical */
+    padding-bottom: 10px; 
+    align-items: flex-start; 
+    gap: 15px; 
+    padding-top: 15px; 
+}
+/* CRÍTICO: Força o painel .active a ser exibido como FLEX. Este é o painel BÁSICO no carregamento inicial. */
+.toolbar-pane.active {
+    display: flex !important;
+}
+/* Estilos da scrollbar horizontal no .toolbar-pane */
+.toolbar-pane::-webkit-scrollbar {
+    height: 8px;
+}
+.toolbar-pane::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 10px;
+    border: 2px solid var(--bg-card);
+}
+.toolbar-pane::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* O formula-content-details já está com display block acima, vamos garantir o reset */
+.formula-content-details {
+    display: block !important;
+    margin-top: 0;
+    /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
+    padding: 0 2px 2px 2px; 
+}
+
+
+/* Correção Definitiva – Grid das Funções */
+/* Este bloco é AGORA obsoleto e será substituído por um estilo de grupo flex */
+
+
+/* CORREÇÃO CRÍTICA: O Separador AGORA é VERTICAL */
+.divider {
+    /* Oculta os divisores horizontais originais */
+    display: none !important;
+}
+
+/* NOVO: Separador Vertical entre os Grupos */
+/* Estilo para que o JS possa inserir um divisor vertical */
+.toolbar-pane .divider {
+    display: block !important;
+    width: 1px;
+    height: 100%; 
+    background: var(--border);
+    margin: 0; 
+    flex-shrink: 0; 
+}
+
+
+/* FÓRMULAS DETALHE (Conteúdo Nível 3) */
+.formula-content-details h3, .formula-content-details h2 {
+    /* Oculta os cabeçalhos H2/H3 internos, pois usamos .toolbar-section-title */
+    display: none !important; 
+}
+.formula-content-details .formula-pane {
+    /* Inicia escondido (será sobrescrito pelo .active abaixo) */
+    display: none !important;
+    padding-bottom: 0; 
+    
+    /* NOVO: Configura o container para ROLAGEM HORIZONTAL */
+    flex-direction: row !important; 
+    flex-wrap: nowrap; 
+    overflow-x: auto !important; /* Mantém scroll horizontal */
+    overflow-y: hidden !important; /* Remove scroll vertical */
+    
+    align-items: flex-start; 
+    gap: 15px; /* Espaçamento entre os itens de fórmula na horizontal */
+    padding-top: 15px; 
+}
+.formula-content-details .formula-pane.active {
+    /* CRÍTICO: Configura o painel ativo de fórmulas para GRID 2xN horizontal */
+    display: grid !important; 
+    /* 2 linhas de 120px de altura */
+    grid-template-rows: 120px 120px; 
+    /* Colunas automáticas para cada item, sem quebras */
+    grid-auto-columns: 280px; 
+    grid-auto-flow: column; /* Faz com que os itens preencham horizontalmente */
+    
+    padding: 0;
+    gap: 15px; /* Espaçamento entre colunas/itens */
+    padding-top: 15px;
+}
+
+/* STRONG GUARD: Garantir que qualquer .formula-pane só seja visível
+   quando o container mestre #formula-content-area estiver ativo. Isso
+   evita que painéis de fórmula apareçam enquanto a aba Funções estiver ativa. */
+#formula-content-area .formula-pane { display: none !important; }
+#formula-content-area.active .formula-pane.active { display: grid !important; }
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 6: Estilos de Notação Matemática (Placeholders, Raiz, Fração) */
+/* === ÍCONES VISUAIS (Placeholder Quadrados) === */
+.square-placeholder {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid currentColor;
+    background-color: transparent;
+    margin: 0 1px;
+    vertical-align: middle;
+}
+.square-placeholder.small {
+    width: 7px; height: 7px; border-width: 1px; margin-bottom: 6px;
+}
+.square-placeholder.sub {
+    width: 7px; height: 7px; border-width: 1px; vertical-align: sub; margin-bottom: 0;
+}
+.fraction-icon {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    vertical-align: middle; margin: 0 2px; line-height: 1;
+}
+.fraction-line {
+    width: 12px; height: 1px; background-color: currentColor; margin: 2px 0;
+}
+.root-symbol { font-family: serif; font-size: 1.1em; }
+
+
+
+/* Bloco 7: Estilos da Seção Editor (Card, Variáveis, Input) */
+/* === EDITOR & INPUT (CORREÇÃO DE LAYOUT) === */
+.editor-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    /* NOVO: Aplica o arredondamento ao container principal do editor/variáveis */
+    border-radius: var(--radius); 
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border); /* Adiciona borda única ao container */
+    background: var(--bg-card); /* Define o background principal */
+    margin-bottom: 25px; /* Adiciona o gap para o próximo elemento */
+    
+    /* CRÍTICO: Ajusta a margem superior para colar no conteúdo da aba ativa (que agora é o elemento ANTERIOR) */
+    margin-top: 25px; 
+    z-index: 1;
+}
+
+/* Painel de Variáveis - Topo do Cartão */
+.variables-panel {
+    background: var(--bg-card);
+    border: none; /* Borda movida para o .editor-section */
+    border-bottom: 1px solid var(--border); /* Linha divisória entre painéis */
+    /* Removido border-radius superior para que cole nas abas */
+    border-radius: var(--radius) var(--radius) 0 0; /* CORREÇÃO: Volta o radius superior para o .variables-panel, pois ele está abaixo das abas. */
+    padding: 15px 20px;
+    margin-bottom: 0; 
+    position: relative;
+    z-index: 2;
+    box-shadow: none; 
+}
+
+.variables-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.panel-title { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+
+.btn-xs {
+    padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+    border: 1px solid var(--border); background: var(--bg-app); color: var(--primary); font-weight: 600; transition: all 0.2s;
+}
+.btn-xs:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+.variables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+
+.variable-item {
+    display: flex; align-items: center; background: var(--bg-app); border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden; transition: all 0.2s; padding: 0; height: 38px;
+    /* CRÍTICO: Garante largura mínima para o item completo */
+    min-width: 240px; 
+}
+.variable-item:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+
+/* --- CORREÇÃO CRÍTICA PARA ÍCONES DO MATHLIVE NA VARIÁVEL (USANDO ::part) --- */
+.variable-item .var-value-editor::part(menu-toggle),
+.variable-item .var-value-editor::part(virtual-keyboard-toggle) {
+    display: none !important;
+}
+/* ----------------------------------------------------------- */
+
+/* Botão de Inserção de Variável (Extrema Esquerda) */
+.variable-item .insert-var-btn {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 38px; /* Largura igual à altura */
+    height: 100%; 
+    font-size: 1.1rem; 
+    color: var(--primary); 
+    cursor: pointer; 
+    transition: all 0.2s;
+    background: rgba(59, 130, 246, 0.08); /* Fundo sutil */
+    border-right: 1px solid var(--border); /* Separador visual */
+}
+.variable-item .insert-var-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Estilo para inputs de Nome e Unidade */
+.variable-item input { background: transparent; border: none; height: 100%; font-size: 0.9rem; color: var(--text-main); padding: 0 8px; outline: none; }
+
+/* CRÍTICO: Largura Fixa para Nome (Var) */
+.variable-item .var-name { 
+    width: 50px; 
+    font-weight: 700; 
+    color: var(--primary); 
+    text-align: center; 
+    border-right: 1px solid var(--border); 
+    background: transparent; 
+    padding: 0 4px; 
+}
+/* CRÍTICO: Largura Fixa para Unidade (Unid.) */
+.variable-item .var-unit { 
+    width: 50px; 
+    color: var(--text-muted); 
+    font-size: 0.8rem; 
+    text-align: center; 
+    border-left: 1px solid var(--border); 
+    background: rgba(0,0,0, 0.02);
+    /* Remove o padding padrão para garantir largura exata */
+    padding: 0 4px; 
+}
+
+/* NOVO ESTILO: Math-field para o valor da variável */
+.variable-item .var-value-editor {
+    flex-grow: 1; 
+    /* CRÍTICO: Garante que o item encolha e não force o transbordamento */
+    min-width: 50px; /* Largura mínima para o valor */
+    /* CRÍTICO: Força o estouro a ser ocultado, permitindo o truncamento se o valor for muito longo */
+    overflow: hidden; 
+    height: 100%;
+    /* Redefine os estilos do math-field para ser um campo de texto inline */
+    background: transparent;
+    border: none;
+    padding: 0 8px;
+    font-size: 0.95rem; /* Um pouco maior que o input normal */
+    color: var(--text-main);
+    outline: none;
+    /* Fonte MathLive para renderização */
+    font-family: 'KaTeX_Main', 'KaTeX_Math', serif !important;
+    
+    /* CRÍTICO: Garante que o MathLive se comporte como um item flexível */
+    display: flex !important;
+    align-items: center; 
+    justify-content: flex-start;
+}
+
+.variable-item .var-value-editor::placeholder {
+    color: var(--text-muted);
+}
+
+/* CRÍTICO: Largura Fixa para Botão Excluir (X) */
+.variable-item .delete-btn { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 30px; 
+    height: 100%; 
+    font-size: 1.1rem; 
+    color: var(--text-muted); 
+    cursor: pointer; 
+    transition: all 0.2s; 
+}
+.variable-item .delete-btn:hover { background: var(--danger-light); color: var(--danger); }
+
+/* CRÍTICO: Largura Fixa para Botão Restaurar (Histórico) */
+.variable-item .restore-btn { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 30px; 
+    height: 100%; 
+    font-size: 1.1rem; 
+    color: var(--primary); 
+    cursor: pointer; 
+    border-left: 1px solid var(--border); 
+    transition: all 0.2s; 
+}
+.variable-item .restore-btn:hover { background: rgba(59, 130, 246, 0.1); }
+
+/* Tooltips (Não alterado) */
+.variable-item[title] { position: relative; cursor: help; }
+.variable-item[data-formula="true"] .var-name::after { content: ''; position: absolute; top: 2px; left: 2px; width: 4px; height: 4px; background-color: var(--primary); border-radius: 50%; }
+.variable-item:hover::before { content: "Origem: " attr(title); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; white-space: nowrap; pointer-events: none; z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; animation: fadeIn 0.2s forwards; margin-bottom: 5px; }
+.variable-item:hover::after { content: ''; position: absolute; bottom: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; opacity: 0; animation: fadeIn 0.2s forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* Wrapper do Input - Base do Cartão (Não alterado) */
+.unified-input-wrapper {
+    background: var(--bg-card);
+    border-radius: 0 0 var(--radius) var(--radius); /* Arredonda só embaixo */
+    border: none; /* Borda movida para o .editor-section */
+    box-shadow: none; /* Sombra movida para o .editor-section */
+    padding: 0;
+    display: flex; flex-direction: column; gap: 0; 
+    margin-top: 0; /* Remove a margem superior */
+    position: relative; z-index: 3;
+}
+
+.label-group { margin: 0; padding: 10px 10px 0 10px; border-bottom: 1px solid var(--border); }
+#calc-label { width: 100%; padding: 0 0 10px 0; border: none; background: transparent; color: var(--text-muted); font-size: 0.9rem; outline: none; }
+
+.input-group { 
+    border: none; 
+    box-shadow: none; 
+    padding: 0 10px 10px 10px; 
+    margin: 0; 
+    display: flex; 
+    gap: 10px; 
+    align-items: flex-start;
+    cursor: text !important; /* CORREÇÃO: Aplica cursor ao grupo pai */
+}
+
+/* CORREÇÃO CRÍTICA: Força a herança da fonte MathLive para garantir a renderização */
+math-field {
+    flex-grow: 1; 
+    background: transparent; 
+    border: none; 
+    font-size: 1.25rem; 
+    padding: 8px 0 0 0; 
+    padding-bottom: 28px; 
+    min-height: 44px; 
+    cursor: text; 
+    color: var(--text-main);
+    
+    width: 100%; 
+    box-sizing: border-box; 
+
+    margin-right: 14px; 
+    /* Esta linha é crucial para garantir que as fontes sejam aplicadas */
+    font-family: 'KaTeX_Main', 'KaTeX_Math', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_Typewriter', serif !important;
+}
+
+math-field:focus, math-field:focus-within { outline: none; }
+
+/* CORREÇÃO CRÍTICA: GARANTE A VISIBILIDADE DOS BOTÕES DE AÇÃO */
+.editor-actions { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    align-items: center; 
+    width: 140px; 
+}
+
+/* REFORÇO CRÍTICO: Garantir que o display flex seja absoluto para estes botões, resolvendo o problema visual */
+.btn-icon { 
+    background: transparent; 
+    border: 1px solid var(--border); 
+    color: var(--text-muted); 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    display: flex !important; /* REFORÇO CRÍTICO */
+    align-items: center; 
+    justify-content: center; 
+    transition: all 0.2s; 
+}
+.btn-icon:hover { color: var(--primary); border-color: var(--primary); }
+.btn-icon.danger { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+.btn-icon.danger:hover { background: var(--danger); color: white; }
+
+.btn-primary {
+    width: 100%; background: var(--primary); color: white; border: none; 
+    padding: 0 20px; /* AUMENTADO DE 15px para 20px */
+    height: 48px;
+    border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; white-space: nowrap;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+/* Estilo do botão Limpar (agora usa btn-primary danger) */
+.btn-primary.danger { 
+    background: var(--bg-card); 
+    color: var(--danger) !important; 
+    border: 1px solid var(--danger) !important;
+}
+.btn-primary.danger:hover { background: var(--danger-light); }
+
+.btn-primary:disabled, .btn-primary.loading { cursor: not-allowed; opacity: 0.8; background: var(--primary); }
+.btn-primary.loading .loading-icon { display: inline-flex; animation: rotate 1s linear infinite; }
+.btn-primary.loading .calculate-icon { display: none; }
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+
+/* Base styles for toolbar buttons (size/visual handled below) */
+.toolbar-group .toolbar-btn {
+    aspect-ratio: 1 / 1 !important; /* keep square visual if needed */
+    font-size: 0.85rem !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: var(--bg-app);
+    color: var(--text-main);
+    border-radius: 6px;
+    transition: all 0.12s;
+    padding: 4px !important;
+}
+
+.toolbar-group .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* AJUSTE: Layout de grupo de botões em até duas linhas horizontais */
+.toolbar-group {
+    display: flex;
+    flex-wrap: wrap; /* permite a segunda linha */
+    align-items: flex-start;
+    gap: 8px !important;
+
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    /* visual two-line layout; width is computed via JS per group */
+}
+
+/* Força botões a manterem dimensões consistentes para formar duas linhas visuais */
+.toolbar-group .toolbar-btn {
+    flex: 0 0 44px; /* REDUÇÃO: de 56px para 50px */
+    height: 44px; /* REDUÇÃO: de 56px para 50px */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* As regras de scrollbar do .toolbar-group são mantidas escondidas para limpeza visual */
+.toolbar-group::-webkit-scrollbar { display: none !important; }
+
+/* NOVO BLOCO DE ESTILO: CURSOR E ÁREA DE CLIQUE PARA ITENS DE FÓRMULA */
+.formula-item {
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+    /* CRÍTICO: Garante o cursor de clique no contêiner */
+    cursor: pointer; 
+    
+    /* NOVO: Define o tamanho do item para caber em duas linhas no scroll horizontal */
+    width: 280px; 
+    height: 120px; 
+    
+    margin: 0; 
+    
+    /* Garante o layout interno vertical */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: relative; /* allow absolute overlay to cover the whole card */
+}
+.formula-item:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary);
+}
+.formula-item h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 5px;
+}
+.formula-item math-field[read-only] {
+    font-size: 1.1em;
+    padding: 0;
+    width: 100%;
+    
+    /* CRÍTICO: Neutraliza o comportamento de edição do MathLive no read-only */
+    cursor: default !important; /* Anula o cursor text-bar do Shadow DOM do MathLive */
+    pointer-events: none !important; /* Permite que o clique passe para o contêiner .formula-item */
+    user-select: none !important;
+}
+
+/* Transparent overlay that captures pointer events to avoid selecting math-field internals */
+.formula-item .formula-overlay {
+    position: absolute;
+    inset: 0; /* top:0; right:0; bottom:0; left:0; */
+    z-index: 99999 !important;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto; /* overlay should capture the click */
+}
+
+/* ---------------------------------------------------------------------------------- */
+/* CRÍTICO: Configura os painéis de fórmula (level-2 panes) para o layout de 2 linhas em Grid. */
+.formula-content-details .formula-pane { 
+    /* Garante que o container interno do .formula-pane use Grid */
+    display: grid !important; 
+    /* 2 linhas de 120px de altura */
+    grid-template-rows: 120px 120px; 
+    /* Colunas automáticas para cada item, sem quebras */
+    grid-auto-columns: 280px; 
+    grid-auto-flow: column; /* Faz com que os itens preencham horizontalmente */
+    
+    /* Zera o padding e o gap originais para evitar conflitos de cálculo */
+    padding: 0;
+    gap: 15px; /* Espaçamento entre colunas/itens */
+    
+    /* Padding Top (Separador Visual) */
+    padding-top: 15px;
+}
+/* Garante que apenas o painel ativo seja exibido (o display none inicial ainda funciona) */
+.formula-content-details .formula-pane.active { display: grid !important; }
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 8: Estilos Rodapé Técnico e Resultado/Plotly */
+/* === RODAPÉ TÉCNICO (Códigos) === */
+.tech-footer {
+    background: var(--bg-app); border: 1px solid var(--border); border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius); padding: 8px 15px; font-size: 0.85rem; color: var(--text-muted); transition: all 0.2s; margin-top: 0;
+}
+.tech-footer[open] { background: var(--bg-card); padding-bottom: 15px; box-shadow: var(--shadow); }
+.tech-footer summary { cursor: pointer; list-style: none; font-weight: 500; opacity: 0.8; transition: opacity 0.2s; display: flex; align-items: center; outline: none; }
+.tech-footer summary:hover { opacity: 1; color: var(--primary); }
+.tech-footer summary::-webkit-details-marker { display: none; }
+.tech-content { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-top: 12px; border-top: 1px dashed var(--border); animation: fadeIn 0.2s ease-in-out; }
+.tech-group { display: flex; flex-direction: column; gap: 5px; }
+.tech-group label { font-weight: 700; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; }
+.tech-group input { background: var(--bg-app); border: 1px solid var(--border); padding: 8px 10px; border-radius: 4px; color: var(--text-main); font-family: monospace; font-size: 0.85rem; width: 100%; }
+.tech-group input:focus { outline: none; border-color: var(--primary); background: var(--bg-card); }
+
+
+/* === RESULTADO & GRÁFICO === */
+.result-card {
+    background: var(--bg-card); border-radius: var(--radius); padding: 25px; border: 1px solid var(--border);
+    box-shadow: var(--shadow); border-left: 5px solid var(--primary); display: flex;
+    flex-direction: column;
+    /* REMOVEMOS MARGIN-TOP para controlar o espaçamento no fluxo */
+}
+.result-card.hidden { display: none; }
+#result-output { 
+    font-size: 1.6rem; 
+    padding: 8px 0 16px 0; 
+    width: 100%; 
+    pointer-events: none; 
+    /* CRÍTICO: Garante que a saída use as fontes de renderização do MathLive/KaTeX */
+    font-family: 'KaTeX_Main', 'KaTeX_Math', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_Typewriter', serif !important; 
+}
+
+/* Container do Gráfico PLOTLY */
+#plot-container {
+    display: none; /* JS muda para flex */
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100%;
+    margin-top: 25px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    background-color: transparent;
+}
+/* Div interna do Plotly */
+#plotly-graph {
+    width: 100% !important;
+    height: 500px !important;
+}
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 9: Estilos das Sidebars (Histórico e Memorial) */
+/* === SIDEBAR HISTÓRICO (Antigo Memória) === */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background: var(--bg-sidebar);
+    border-left: 1px solid var(--border);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    /* CRÍTICO: Z-index aumentado para 9000 para sobrepor o main-content */
+    z-index: 9000; 
+    box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+    
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.open {
+    transform: translateX(0); 
+}
+
+/* NOVO: Estiliza o cabeçalho do Histórico para alinhamento horizontal */
+.sidebar-header {
+    display: flex;
+    /* Usa space-between para colocar o botão no canto direito */
+    justify-content: space-between; 
+    align-items: center;
+    padding: 0 0 15px 0; /* Ajustado padding */
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+.sidebar-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+/* Move o botão Limpar para o canto superior direito (já está dentro do header) */
+#clear-history-btn {
+    /* Reusando estilo de botão icon, mas garantindo que ele seja um alvo de clique */
+    width: 32px; /* Adicionado largura/altura para melhor hit area */
+    height: 32px;
+    padding: 5px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#clear-history-btn:hover {
+    color: var(--danger);
+    background-color: var(--danger-light);
+}
+
+.history-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px; /* Para melhor visualização da barra de rolagem */
+}
+.history-item {
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.history-item:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary);
+}
+.history-result-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.history-result-group .delete-btn {
+    font-size: 1rem;
+    color: var(--danger);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+.history-result-group .delete-btn:hover {
+    opacity: 1;
+}
+
+/* REFORÇO CRÍTICO: Garantir que o container de rolagem da Library seja horizontal, não vertical */
+#library-content-scroll {
+    flex-grow: 1;
+    overflow-y: hidden; /* Remove o scroll vertical indesejado */
+    /* CORREÇÃO CRÍTICA: Remove o padding horizontal. O padding agora está em #toolbar-content-area */
+    padding: 0 0 20px 0; 
+}
+
+
+
+/* ======================================================= */
+/* Bloco 10: Botões de Ação (Calculo, Limpar, Salvar Var) */
+/* ======================================================= */
+
+/* NOVO: Estilo para o grupo de botões "Limpar" e "Calcular" */
+.button-group-bottom {
+    display: flex; /* Alinha os itens em linha */
+    gap: var(--space-3); /* Espaçamento entre os botões */
+    margin-top: var(--space-4); /* Espaço acima do grupo */
+    margin-bottom: var(--space-4); /* Espaço abaixo do grupo */
+    width: 100%; /* Ocupa a largura total */
+}
+
+.button-group-bottom .btn {
+    flex: 1; /* Faz com que os botões dividam o espaço igualmente */
+    min-height: 48px; /* Altura mínima para botões de ação */
+    font-size: 1rem;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2); /* Espaço entre ícone e texto */
+}
+
+/* Estilos para o botão Limpar */
+.btn-red {
+    background-color: var(--danger);
+    color: var(--white);
+    border: 1px solid var(--danger);
+    transition: all var(--trans-med) var(--trans-ease);
+}
+.btn-red:hover {
+    background-color: var(--danger-dark);
+    border-color: var(--danger-dark);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Estilos para o botão de Cálculo (Primário) */
+.btn-primary {
+    background-color: var(--primary);
+    color: var(--white);
+    border: 1px solid var(--primary);
+    transition: all var(--trans-med) var(--trans-ease);
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: var(--shadow-sm);
+}
+.btn-primary.loading {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Estilos para ícones de carregamento */
+.loading-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Antigos estilos de botões que podem ser removidos/refatorados */
+/*
+#calculate-btn { ... }
+#clear-btn { ... }
+*/
+
+/* NOVO: Estilos para o botão de Salvar Variável (se ele for movido ou ajustado) */
+#save-var-btn {
+    /* Estilos se este botão for separado, caso contrário, será incluído em algum grupo */
+}
+
+
+
+/* ===============================================================================================*/
+/* ===============================================================================================*/
+/* Bloco 11: Estilos dos Toggles Flutuantes (Mobile) */
+/* Botão Flutuante para ABRIR o Teclado */
+.btn-fixed-bottom {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px; /* Formato Pílula */
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2); /* Sombra ajustada */
+    font-size: 1rem;
+    font-weight: 600;
+    z-index: 9999; /* Z-INDEX MÁXIMO PARA GARANTIR VISIBILIDADE */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s, opacity 0.3s, bottom 0.3s;
+}
+.btn-fixed-bottom:hover { background-color: var(--primary-hover); }
+
+/* Esconde o botão flutuante quando o teclado está aberto */
+#keyboard-toggle.hidden {
+    opacity: 0;
+    pointer-events: none; /* Não clicável */
+    bottom: -50px; /* Move para fora da vista */
+}
+
+
+
+
+/* Bloco 12: Media Queries (Responsividade) */
+/* === RESPONSIVIDADE === */
+
+/* REGRA GERAL PARA GARANTIR A ROLAGEM EM TODAS AS TELAS QUANDO O TECLADO ESTÁ ABERTO */
+body.keyboard-open .main-content {
+    /* Valor alto para compensar o teclado grande (Max-Height: 400px + 200px de folga de scroll) */
+    padding-bottom: 600px; 
+}
+
+
+/* --- ESTILOS DE TELA GRANDE (Widescreen > 1200px) --- */
+@media (min-width: 1201px) {
+    /* Estado padrão: Ambas as gavetas abertas */
+    .sidebar:not(.override-close) {
+        transform: translateX(0);
+    }
+    
+    /* Desloca o conteúdo principal: mantenha alinhado à esquerda; sidebars irão sobrepor */
+    .main-content {
+        padding-left: 30px; /* minimal padding; sidebars overlay instead of pushing */
+        padding-right: 30px;
+        z-index: 1; /* Abaixa o z-index do conteúdo principal */
+    }
+    
+    /* Esconde os botões de toggle quando as gavetas estão abertas por padrão */
+    #sidebar-toggle, #nexus-toggle {
+        display: none !important;
+    }
+    
+    /* O BOTÃO DO TECLADO DEVE FICAR VISÍVEL (SEM DISPLAY: NONE) */
+}
+
+
+/* --- ESTILOS DE TELA MÉDIA (901px a 1200px) --- */
+@media (min-width: 901px) and (max-width: 1200px) {
+    .sidebar {
+        transform: translateX(100%);
+    }
+    
+    /* Desloca o conteúdo principal apenas pelo Memorial */
+    .main-content {
+        /* Keep minimal padding so sidebars overlay instead of pushing content */
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    
+    /* CRÍTICO: Ocultar o toggle Histórico em Tela Média IMEDIATAMENTE */
+    #sidebar-toggle {
+        display: none !important;
+        right: 30px; 
+    }
+    
+    /* NEXUS (esquerda) ficará recolhido em telas médias - exibe seu toggle */
+    #nexus-toggle {
+        display: flex !important;
+        left: 0px;
+    }
+    
+    /* O BOTÃO DO TECLADO DEVE FICAR VISÍVEL (SEM DISPLAY: NONE) */
+
+    /* NOVO/CRÍTICO DE CONTENÇÃO: ANULA QUALQUER DESLOCAMENTO ESQUERDO */
+    /* Garante que o padding-left seja 30px, mesmo que body.nexus-visible esteja ativo (injecção do core) */
+    body.nexus-visible .main-content {
+        padding-left: 30px !important;
+    }
+    
+    /* NOVO/CRÍTICO: Remove o padding de deslocamento que era aplicado no TABLET */
+    body.sidebar-visible .main-content {
+        padding-right: 30px; /* Volta ao padding normal */
+    }
+    
+    /* Garante que o conteúdo fique alinhado à esquerda na área disponível (sem ser centralizado) */
+    .main-content {
+        align-items: stretch; 
+    }
+    .main-content > * {
+        max-width: 100%; 
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+
+/* --- ESTILOS DE TELA PEQUENA (<= 900px) --- */
+@media (max-width: 900px) {
+    /* ... (Estilos de responsividade existentes para mobile/tablet) ... */
+    .tab-handle {
+        width: 120px;
+        height: 35px;
+    }
+    .tab-handle.active {
+        height: 35px;
+    }
+    
+    /* Garante que os toggles laterais sejam reposicionados */
+    .main-content {
+        padding-right: 15px; /* Ajusta padding para mobile */
+        padding-left: 15px; 
+    }
+    #sidebar-toggle {
+        /* CRÍTICO: Removido !important para permitir que o deslocamento para 335px funcione */
+        right: 15px; 
+        display: flex !important; /* Visível por padrão */
+    }
+    /* CORREÇÃO CRÍTICA: O Bloco 3 está agora controlando o deslocamento do toggle Histórico para 350px. Aqui ajustamos apenas o posicionamento em mobile */
+    .sidebar.open ~ #sidebar-toggle {
+        right: 335px; /* 320px (sidebar) + 15px (novo padding) */
+    }
+    
+    /* NEXUS toggle - visível em mobile e ajustado para padding */
+    #nexus-toggle {
+        left: 15px; /* Ajustado para 15px de padding */
+        z-index: 1600;
+        display: flex !important;
+    }
+    .sidebar.left.open ~ #nexus-toggle {
+        left: 335px; /* 320px (sidebar) + 15px (novo padding) */
+    }
+
+    /* Small screens: center the main content and keep sidebars as overlay drawers */
+    .main-content {
+        padding-left: 15px;
+        padding-right: 15px;
+        align-items: center; /* center children horizontally */
+    }
+    /* CORREÇÃO CRÍTICA: Permite que o conteúdo ocupe a largura total do container */
+    .main-content > * {
+        max-width: 100%; /* ALTERADO DE 1000px PARA 100% */
+        width: 100%; /* ALTERADO DE auto PARA 100% */
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* When Nexus is visible in desktop (non-drawer) mode, shift content to sit to the right of Nexus */
+@media (min-width: 1201px) {
+    body.nexus-visible .main-content {
+        padding-left: 350px; /* 320px Nexus width + 30px spacing */
+    }
+}
+
+
+/* When right sidebar (Histórico) is visible on large screens, shift content right padding */
+@media (min-width: 1201px) {
+    body.sidebar-visible .main-content {
+        padding-right: 350px; /* 320px sidebar width + 30px spacing */
+    }
+}
+
+/* CORREÇÃO CRÍTICA: Remove o padding de deslocamento para Histórico APENAS em Mobile (<= 900px). */
+@media (max-width: 900px) { 
+    body.sidebar-visible .main-content {
+        padding-right: 15px; /* Retorna ao padding base do mobile */
+    }
+}
+
+
+/* When both sidebars are visible, center content between them by applying both paddings */
+body.nexus-visible.sidebar-visible .main-content {
+    padding-left: 350px;
+    padding-right: 350px;
+}
+
+/* NOVO: Corrige o padding-left/right da regra acima para mobile/tablet */
+@media (max-width: 1200px) {
+    body.nexus-visible.sidebar-visible .main-content {
+        padding-left: 30px; 
+        padding-right: 30px; 
+    }
+}

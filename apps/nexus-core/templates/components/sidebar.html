@@ -1,0 +1,107 @@
+<aside class="sidebar left" id="app-nexus" data-nexus-block="1:Estrutura Principal da Sidebar">
+
+    <div class="sidebar-search">
+        <span class="material-icons-round search-icon">search</span>
+        <input 
+            type="text" 
+            id="sidebar-search-input" 
+            placeholder="Buscar fórmula, app ou comando..."
+            autocomplete="off"
+        >
+    </div>
+
+    <div class="brand-container">
+        <div class="brand-header">
+            <img src="{{ url_for('static', path='img/nexus_logo.png') }}" alt="Logo NEXUS">
+            <h2>NEXUS Platform</h2>
+        </div>
+    </div>
+    <nav class="nav-links" id="sidebar-tools-list">
+        
+        <h4 class="nav-group-title">Navegação Principal</h4>
+
+        <div class="nav-item-wrapper">
+            <a href="/" 
+                class="nav-link {% if app_path == '/' %}active{% endif %}" 
+                data-name="dashboard home inicio">
+                <span class="material-icons-round">dashboard</span>
+                Dashboard
+            </a>
+        </div>
+        
+
+        <h4 class="nav-group-title">Área de Trabalho</h4>
+        
+        <div class="nav-item-wrapper">
+            <a href="{{ url_for('solver_index') }}" 
+                class="nav-link {% if app_path == '/solver' %}active{% endif %}" 
+                data-name="solver engenharia calculadora cálculo formula matemática">
+                <span class="material-icons-round">calculate</span>
+                Solver Engenharia
+            </a>
+        </div>
+
+        <div class="nav-item-wrapper">
+            <a href="/unit_converter" 
+                class="nav-link {% if app_path == '/unit_converter' %}active{% endif %}" 
+                data-name="conversor unidades medida conversão física">
+                <span class="material-icons-round">straighten</span>
+                Conversor de Unidades
+            </a>
+        </div>
+
+
+        <h4 class="nav-group-title">Ferramentas e Gestão</h4>
+        
+        <div class="nav-item-wrapper">
+            <a href="/library" 
+                class="nav-link {% if app_path == '/library' %}active{% endif %}" 
+                data-name="biblioteca formulas constantes library">
+                <span class="material-icons-round">archive</span>
+                Library de Modelos
+            </a>
+        </div>
+
+        <div class="nav-item-wrapper">
+            <a href="/profile" 
+                class="nav-link {% if app_path == '/profile' %}active{% endif %}" 
+                data-name="perfil account usuario config">
+                <span class="material-icons-round">settings</span>
+                Configurações & Perfil
+            </a>
+        </div>
+
+    </nav>
+
+    <div class="sidebar-feedback">
+        <textarea 
+            id="feedback-text"
+            placeholder="O que você sente falta na plataforma?"
+            rows="3"
+        ></textarea>
+
+        <input 
+            type="email" 
+            id="feedback-email" 
+            placeholder="Seu e-mail (opcional)"
+        >
+
+        <button class="feedback-send-btn" id="feedback-send-btn">
+            Enviar sugestão
+            <span class="material-icons-round">send</span>
+        </button>
+
+        <p id="feedback-result" class="feedback-result"></p>
+
+    </div>
+
+    <div class="sidebar-footer">
+        <h4 class="nav-group-title">Comunicação</h4>
+        <a href="#" class="nav-link" data-name="sugerir melhorias" style="margin-bottom: 10px;">
+            <span class="material-icons-round">chat</span>
+            Sugerir Melhorias (Feedback)
+        </a>
+        <span>© 2025 NEXUS Systems</span>
+    </div>
+
+</aside>

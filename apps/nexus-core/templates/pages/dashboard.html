@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}NEXUS Dashboard{% endblock %}
+
+{% block content %}
+    <div class="main-dashboard">
+        <h1>Bem-vindo ao NEXUS Core</h1>
+        <p>Esta é a área principal de destino (Dashboard). Selecione um micro-app para começar a trabalhar.</p>
+
+        <!-- Cards de micro-apps -->
+        <div class="dashboard-apps-grid">
+            <!-- Card: Solver Engenharia -->
+            <div class="app-card">
+                <div class="app-card-icon">
+                    <span class="material-icons-round">calculate</span>
+                </div>
+                <h3>Solver Engenharia</h3>
+                <p>Ferramenta avançada para cálculos profissionais e resolução de fórmulas.</p>
+                <a href="{{ url_for('solver_index') }}" class="btn-card-link">
+                    Acessar Solver
+                    <span class="material-icons-round">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Card: Library (Fórmulas e Constantes) -->
+            <div class="app-card">
+                <div class="app-card-icon">
+                    <span class="material-icons-round">archive</span>
+                </div>
+                <h3>Library</h3>
+                <p>Acesso rápido a fórmulas comuns e constantes de engenharia.</p>
+                <a href="/library" class="btn-card-link">
+                    Acessar Library
+                    <span class="material-icons-round">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Card: Meu Perfil -->
+            <div class="app-card">
+                <div class="app-card-icon">
+                    <span class="material-icons-round">account_circle</span>
+                </div>
+                <h3>Meu Perfil</h3>
+                <p>Gerenciar suas configurações e preferências de usuário.</p>
+                <a href="/profile" class="btn-card-link">
+                    Acessar Perfil
+                    <span class="material-icons-round">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+        <!-- Iframe container to embed micro-apps without leaving dashboard -->
+        <div id="microapp-embed" style="margin-top:20px; display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <strong id="microapp-title">Micro-app</strong>
+                <div>
+                    <button id="microapp-close" class="btn btn-sm btn-outline-secondary">Fechar</button>
+                </div>
+            </div>
+            <iframe id="microapp-frame" src="" style="width:100%; height:720px; border:1px solid #e6e6e6; border-radius:8px;"></iframe>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        (function(){
+            const frame = document.getElementById('microapp-frame');
+            const embed = document.getElementById('microapp-embed');
+            const title = document.getElementById('microapp-title');
+            const closeBtn = document.getElementById('microapp-close');
+
+            document.querySelectorAll('.btn-card-link').forEach(btn => {
+                btn.addEventListener('click', function(e){
+                    const href = this.getAttribute('href');
+                    // if link points to solver, load in iframe
+                    if (href && href.indexOf('/solver') === 0) {
+                        e.preventDefault();
+                        frame.src = href;
+                        title.textContent = 'Solver Engenharia';
+                        embed.style.display = 'block';
+                        // scroll to iframe
+                        setTimeout(() => embed.scrollIntoView({behavior:'smooth'}), 100);
+                    }
+                });
+            });
+
+            if (closeBtn) closeBtn.addEventListener('click', function(){
+                frame.src = '';
+                embed.style.display = 'none';
+            });
+        })();
+    </script>
+{% endblock %}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head data-nexus-block="1:Head e Estilos Globais">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS Platform | {{ app_title }}</title>
+
+    <link rel="icon" href="{{ url_for('static', path='img/nexus_logo.png') }}">
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='img/nexus_logo_dark.png') }}" media="(prefers-color-scheme: dark)">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', path='css/core.css') }}?v=1.0">
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+
+<body data-nexus-block="2:Estrutura Principal de Layout">
+
+    <button id="menu-toggle" class="menu-toggle btn-icon">
+        <span class="material-icons-round">menu</span>
+    </button>
+
+    <div class="app-layout">
+
+        {% include 'components/sidebar.html' %} 
+
+        <main class="main-content">
+
+            <header class="app-header">
+                <h1>
+                    <span class="material-icons-round">{{ app_icon }}</span>
+                    {{ app_title }}
+                </h1>
+
+                <div class="header-actions">
+                    <button id="theme-toggle-btn" class="btn-icon">
+                        <span class="material-icons-round">dark_mode</span>
+                    </button>
+                    <button class="btn-icon">
+                        <span class="material-icons-round">notifications</span>
+                    </button>
+                </div>
+            </header>
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+<script data-nexus-block="3:Scripts Globais" src="{{ url_for('static', path='js/sidebar.js') }}"></script>
+    <script src="{{ url_for('static', path='js/core.js') }}"></script>
+
+    {% block extra_scripts %}
+    {% endblock %}
+
+</body>
+</html>

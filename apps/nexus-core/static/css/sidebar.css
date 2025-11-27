@@ -1,0 +1,183 @@
+/* ============================================================================
+   NEXUS Platform — Sidebar Stylesheet
+   Path: /apps/nexus-core/static/css/sidebar.css
+   ============================================================================ */
+
+/* ---------------------------
+   STRUCTURE
+----------------------------*/
+
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--surface-1);
+    border-right: 1px solid var(--border);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 6px;
+}
+
+/* ---------------------------
+   SEARCH BAR
+----------------------------*/
+
+.sidebar-search {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    background: var(--surface-1);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    z-index: 10;
+}
+
+.sidebar-search input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.sidebar-search input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* ---------------------------
+   TOOL SECTIONS
+----------------------------*/
+
+.tools-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: .6;
+    letter-spacing: .5px;
+    margin: 18px 0 8px;
+    color: var(--text-muted);
+}
+
+.tools-category {
+    margin-bottom: 12px;
+}
+
+.tool-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--surface-2);
+    transition: background .16s ease;
+    border: 1px solid var(--surface-2);
+}
+
+.tool-item:hover {
+    background: var(--surface-hover);
+}
+
+.tool-item.active {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+/* Icon inside item */
+.tool-item .material-icons-round {
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
+/* Tool label */
+.tool-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* ---------------------------
+   FOOTER ACTIONS
+----------------------------*/
+
+.sidebar-footer-block {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.sidebar-footer-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: .6;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+}
+
+/* Inputs */
+
+.sidebar-input {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.sidebar-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Buttons */
+
+.sidebar-btn {
+    width: 100%;
+    padding: 9px 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background .2s ease;
+}
+
+.sidebar-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* ---------------------------
+   RESPONSIVE
+----------------------------*/
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 260px;
+        position: fixed;
+        top: 0;
+        left: -260px;
+        height: 100vh;
+        transition: left .3s ease;
+        z-index: 2000;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+}

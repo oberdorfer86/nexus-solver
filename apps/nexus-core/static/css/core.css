@@ -1,0 +1,1529 @@
+/* ===========================================================
+   Bloco 1 — Variáveis, Tokens Globais, Reset e Tema Dark
+   Arquivo: /static/css/style.css
+   =========================================================== */
+
+/* -----------------------------------------------------------
+   ROOT: Tokens do Tema Corporativo NEXUS
+   ----------------------------------------------------------- */
+:root {
+    /* Tipografia */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --base-font-size: 16px;
+
+    /* Cores — Tema LIGHT (padrão) */
+    --bg-app: #f3f4f6;         /* Fundo principal */
+    --bg-card: #ffffff;        /* Fundo de cartões, painéis, widgets */
+    --bg-sidebar: #ffffff;     /* Sidebar fixa / drawer mobile */
+
+    --primary: #3b82f6;        /* Azul corporativo */
+    --primary-hover: #2563eb;  /* Azul mais forte */
+
+    --text-main: #1f2937;      /* Quase preto */
+    --text-muted: #6b7280;     /* Cinza para descrições */
+
+    --danger: #ef4444;         /* Erros, avisos */
+    --border: #e5e7eb;         /* Divisores */
+
+    /* Layout */
+    --sidebar-width: 250px;
+    --sidebar-width-collapsed: 64px;
+    --breakpoint-md: 900px;
+
+    /* Espaçamentos escalares */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 40px;
+
+    /* Bordas e Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 2px rgba(16,24,40,0.04);
+    --shadow-md: 0 6px 18px rgba(16,24,40,0.08);
+
+    /* Transições */
+    --trans-fast: 150ms;
+    --trans-med: 220ms;
+    --trans-ease: cubic-bezier(.2, .9, .3, 1);
+}
+
+/* -----------------------------------------------------------
+   Tema DARK — aplicado quando html[data-theme="dark"]
+   ----------------------------------------------------------- */
+html[data-theme="dark"] {
+    --bg-app: #0b1220;
+    --bg-card: #0f1724;
+    --bg-sidebar: #0f1724;
+
+    --primary: #0ea5e9;
+    --primary-hover: #38bdf8;
+
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+
+    --danger: #f87171;
+    --border: #1f2937;
+}
+
+/* -----------------------------------------------------------
+   Reset Global + Normalizações
+   ----------------------------------------------------------- */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: var(--base-font-size);
+    height: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg-app);
+    color: var(--text-main);
+    overflow: hidden; /* layout controla o scroll */
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* Mídia */
+img, picture, video {
+    display: block;
+    max-width: 100%;
+}
+
+/* Links */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Botões */
+button {
+    font: inherit;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+}
+
+/* Campos */
+input, textarea, select {
+    font: inherit;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: inherit;
+}
+
+/* Classe utilitária para áreas roláveis internas */
+.nexus-scroll {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+
+/* ===========================================================
+   Bloco 2 — Estrutura do Layout (Sidebar fixa + Drawer Mobile + Main Content)
+   Arquivo: /static/css/style.css
+   =========================================================== */
+
+/* Bloco 2: Grid principal da aplicação */
+.app-layout {
+    display: grid;
+    /* CRÍTICO: Define o layout de colunas fixo apenas para telas grandes */
+    grid-template-columns: var(--sidebar-width) 1fr; 
+    width: 100%;
+    height: 100vh;
+    background: var(--bg-app);
+    overflow: hidden; /* controle de scroll em áreas específicas */
+    transition: none !important; /* NEUTRALIZAÇÃO TOTAL DA TRANSIÇÃO DE LAYOUT */
+}
+
+/* Bloco 2: Sidebar - estado desktop (fixa à esquerda) */
+.sidebar {
+    grid-column: 1;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5) var(--space-4);
+    position: relative;
+    z-index: 120;
+    box-shadow: var(--shadow-sm);
+    /* Mantém a transição APENAS na largura (para modo mini) e transform (para overlay) */
+    transition: transform var(--trans-med) var(--trans-ease), width var(--trans-med) var(--trans-ease);
+}
+
+/* Quando houver variação futura para sidebar mini */
+.sidebar.sidebar--collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+/* Bloco 2: Comportamento principal do conteúdo */
+.main-content {
+    grid-column: 2;
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* CRÍTICO: Reduz o padding desktop de var(--space-6) para var(--space-5) (20px) */
+    padding: var(--space-5); 
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    align-items: center;
+    transition: none !important; /* NEUTRALIZAÇÃO TOTAL DA TRANSIÇÃO DE PADDING */
+    background: transparent;
+}
+
+/* Largura máxima corporativa do container interno */
+.main-content > * {
+    width: 100%;
+    max-width: 1180px;
+    /* Aplica centralização automática para corrigir desalinhamento em PC/Widescreen */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Bloco 2: Botão menu (hamburger) - apenas visível em mobile */
+.menu-toggle {
+    display: none; /* desktop hidden */
+    position: fixed;
+    top: var(--space-4);
+    left: var(--space-4);
+    z-index: 220;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajustes visuais do ícone interno */
+.menu-toggle .material-icons-round {
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
+/* Mobile / tablet behavior: sidebar becomes overlay drawer */
+/* A regra @media (max-width: 900px) já existe, mas vamos adicionar
+   uma regra específica para o breakpoint de Tablet (max-width: 1200px) */
+
+@media (max-width: 1200px) {
+    /* CRÍTICO: Anula o layout de grid fixo para Tablet/Mobile */
+    .app-layout {
+        grid-template-columns: 1fr; /* Ocupa 100% da largura, a sidebar será um overlay */
+    }
+    .main-content {
+        grid-column: 1; /* Garante que o conteúdo ocupe a coluna 1 e não a 2 */
+        /* Reduz o padding superior no tablet para se ajustar ao header */
+        padding-top: calc(var(--space-6) + 16px);
+    }
+    
+    /* Reposiciona a sidebar para o estado overlay */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-105%); /* escondida por padrão */
+        width: min(92vw, var(--sidebar-width));
+        max-width: var(--sidebar-width);
+        box-shadow: 6px 0 28px rgba(2,6,23,0.28);
+        border-right: none;
+        padding-top: calc(var(--space-6) + 8px);
+        opacity: 0;
+        z-index: 200; /* Z-index alto para sobrepor */
+    }
+    
+    /* Permite que o menu-toggle do core seja visível em Tablet */
+    .menu-toggle {
+        display: inline-flex;
+    }
+    
+    /* CRÍTICO: Reverte a centralização forçada do main-content > * no tablet,
+       para que o padding lateral do main-content controle o espaçamento. */
+    .main-content > * {
+        margin-left: 0;
+        margin-right: 0;
+        /* Em tablet, o padding do main-content é suficiente */
+        max-width: none; 
+    }
+}
+
+
+@media (max-width: 900px) {
+    /* Regras específicas de Mobile (já existentes) */
+    .main-content {
+        padding: calc(var(--space-6) + 56px) var(--space-4) var(--space-6) var(--space-4);
+        align-items: stretch;
+    }
+    .main-content > * {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: none;
+    }
+}
+
+/* Quando aberta */
+.sidebar.open {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Ao abrir a sidebar, evita que o conteúdo de fundo seja clicável (visual) */
+.sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(2,6,23,0.36);
+    z-index: 110;
+    opacity: 0;
+    transition: opacity var(--trans-med) var(--trans-ease);
+    pointer-events: none;
+}
+.sidebar.open ~ .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* Bloco 2: Utilitários relacionados (estado com sidebar aberta no desktop para ajustes) */
+/* Removendo a transição da regra interna para evitar o 'salto' */
+.with-sidebar-open .main-content {
+    padding-left: (--sidebar-width); 
+}
+
+/* Bloco 2: Pequenas regras de foco para acessibilidade */
+.sidebar:focus {
+    outline: none;
+}
+.menu-toggle:focus {
+    outline: 2px solid rgba(59,130,246,0.14);
+    outline-offset: 2px;
+}
+
+
+
+
+
+
+
+
+/* ================================
+   Bloco 3 — Sidebar NEXUS (Componentes Internos)
+   ================================ */
+
+/* SCROLLBAR PERSONALIZADA (Movido do antigo Bloco 3)
+---------------------------------------------*/
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-app);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+/* LINKS PADRÃO / BOTÕES / INPUTS (Movido do antigo Bloco 3)
+---------------------------------------------*/
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+input, select, textarea {
+    font-family: inherit;
+    outline: none;
+}
+
+/* CONTAINER DA SIDEBAR (Removido CSS estrutural conflituoso)
+---------------------------------------------*/
+#nexus-sidebar-header {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 25px;
+    letter-spacing: -1px;
+}
+
+/* LISTA DE APLICAÇÕES / MENU
+---------------------------------------------*/
+#nexus-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nexus-menu-item {
+    padding: 12px 14px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.95rem;
+    color: var(--text-main);
+    transition: all 0.25s ease;
+}
+
+.nexus-menu-item:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
+
+/* ESTADO ATIVO DO MENU */
+.nexus-menu-item.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+
+/* ================================
+   Bloco 4 — Header + Cards + Widgets
+   ================================ */
+
+/* HEADER INTERNO DO DASHBOARD
+---------------------------------------------*/
+#nexus-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+#nexus-page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+#nexus-page-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* GRID PADRÃO DO DASHBOARD
+---------------------------------------------*/
+.nexus-grid {
+    display: grid;
+    gap: 20px;
+}
+
+/* Grid grande (cards principais) */
+.nexus-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Grid médio */
+.nexus-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* Grid total flexível */
+.nexus-grid-1 {
+    grid-template-columns: 1fr;
+}
+
+@media (max-width: 1280px) {
+    .nexus-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .nexus-grid-3,
+    .nexus-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* CARDS PADRÃO NEXUS
+---------------------------------------------*/
+.nexus-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.nexus-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+/* Título do card */
+.nexus-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* Texto interno */
+.nexus-card-text {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+/* Cards de status rápido */
+.nexus-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nexus-stat-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.nexus-stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* BARRAS E SEÇÕES INTERNAS
+---------------------------------------------*/
+.nexus-section {
+    margin-top: 30px;
+}
+
+.nexus-section-title {
+    font-size: 1.3rem;
+    color: var(--text-main);
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+/* LINHA DIVISÓRIA */
+.nexus-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+}
+
+/* BOTÕES PADRÃO
+---------------------------------------------*/
+.nexus-btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 0.95rem;
+    transition: background 0.25s ease;
+}
+
+.nexus-btn:hover {
+    background: var(--primary-hover);
+}
+
+.nexus-btn-outline {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+.nexus-btn-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+
+
+
+/* ============================================
+   Bloco 5 — Tabelas, Badges, Alertas, Chips, Tooltips
+   ============================================ */
+
+/* TABELAS CORPORATIVAS NEXUS
+---------------------------------------------*/
+.nexus-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-card);
+}
+
+.nexus-table thead {
+    background: var(--bg-app);
+}
+
+.nexus-table th {
+    padding: 12px 16px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+}
+
+.nexus-table td {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+}
+
+.nexus-table tr:hover td {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* BADGES / STATUS
+---------------------------------------------*/
+.nexus-badge {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 50px;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.nexus-badge.green {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.nexus-badge.yellow {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.nexus-badge.red {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.nexus-badge.blue {
+    background: #dbeafe;
+    color: #1e3a8a;
+}
+
+/* ALERTAS
+---------------------------------------------*/
+.nexus-alert {
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.nexus-alert.success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.nexus-alert.warning {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+}
+
+.nexus-alert.error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+}
+
+.nexus-alert.info {
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
+    color: #1e40af;
+}
+
+/* CHIPS / TAGS
+---------------------------------------------*/
+.nexus-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 50px;
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    gap: 6px;
+}
+
+.nexus-chip .material-icons-round {
+    font-size: 16px;
+}
+
+/* TOOLTIP
+---------------------------------------------*/
+.nexus-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.nexus-tooltip:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: #1f2937;
+    color: #fff;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 1;
+}
+
+.nexus-tooltip:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    border-width: 6px;
+    border-style: solid;
+    border-color: #1f2937 transparent transparent transparent;
+    z-index: 11;
+}
+
+
+/* ============================================
+   Bloco 6 — Inputs, Formulários, Selects, Switch,
+              Checkbox, Radio, Textareas
+   ============================================ */
+
+
+/* WRAPPERS GERAIS DE FORMULÁRIO
+---------------------------------------------*/
+.nexus-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.nexus-form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* INPUT PADRÃO
+---------------------------------------------*/
+.nexus-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 10px;
+    color: var(--text-main);
+    transition: 0.2s ease;
+}
+
+.nexus-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* INPUT INVALIDO
+---------------------------------------------*/
+.nexus-input.invalid {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+/* TEXTAREA
+---------------------------------------------*/
+.nexus-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 10px 14px;
+    resize: vertical;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-main);
+}
+
+.nexus-textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* SELECT PADRÃO
+---------------------------------------------*/
+.nexus-select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 0.95rem;
+    transition: 0.2s ease;
+}
+
+.nexus-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/*************************************************
+ * SWITCH (ON/OFF)
+ *************************************************/
+.nexus-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    display: inline-block;
+}
+
+.nexus-switch input {
+    display: none;
+}
+
+.nexus-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background: var(--border);
+    transition: .3s;
+    border-radius: 30px;
+}
+
+.nexus-switch-slider::before {
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 2px;
+    bottom: 2px;
+    background: #fff;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+.nexus-switch input:checked + .nexus-switch-slider {
+    background: var(--primary);
+}
+
+.nexus-switch input:checked + .nexus-switch-slider::before {
+    transform: translateX(24px);
+}
+
+/*************************************************
+ * CHECKBOX
+ *************************************************/
+.nexus-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.nexus-checkbox input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+/*************************************************
+ * RADIO
+ *************************************************/
+.nexus-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.nexus-radio input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+
+
+/* ============================================
+   Bloco 7 — Dashboard Corporativo:
+   KPIs, Cards Analíticos, Grids, Status, Avatares,
+   Containers para gráficos
+   ============================================ */
+
+
+/* =====================================================
+   KPI CARD — usado em dashboards corporativos
+   ===================================================== */
+.kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow var(--trans-med);
+}
+
+.kpi-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.kpi-card .kpi-title {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.kpi-card .kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.kpi-trend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.kpi-trend.up {
+    color: #16a34a; /* verde corporativo */
+}
+.kpi-trend.down {
+    color: #dc2626; /* vermelho corporativo */
+}
+
+.kpi-trend .material-icons-round {
+    font-size: 1.2rem;
+}
+
+
+
+/* =====================================================
+   GRID DE KPI (responsivo)
+   ===================================================== */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+}
+
+@media (max-width: 1200px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 900px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 600px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* =====================================================
+   CARD ANALÍTICO (maior, com header)
+   ===================================================== */
+.analytics-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    transition: box-shadow var(--trans-med);
+}
+
+.analytics-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.analytics-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.analytics-card-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.analytics-card-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+
+
+/* =====================================================
+   CONTAINER PARA GRÁFICOS (Chart.js / ECharts / etc)
+   ===================================================== */
+.chart-container {
+    width: 100%;
+    height: 320px;
+    position: relative;
+}
+
+.chart-container.large {
+    height: 420px;
+}
+
+
+
+/* =====================================================
+   STATUS PILL — (usado em tabelas, listas)
+   ===================================================== */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    text-transform: capitalize;
+}
+
+.status-pill.success {
+    background: rgba(16,185,129,0.12);
+    color: #10b981;
+}
+.status-pill.warning {
+    background: rgba(234,179,8,0.12);
+    color: #eab308;
+}
+.status-pill.error {
+    background: rgba(239,68,68,0.12);
+    color: #ef4444;
+}
+.status-pill.info {
+    background: rgba(59,130,246,0.12);
+    color: var(--primary);
+}
+
+
+
+/* =====================================================
+   BADGES pequenas (notificações, contadores)
+   ===================================================== */
+.badge-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 50%;
+}
+
+.badge-counter {
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+
+
+/* =====================================================
+   AVATAR (usuário, engenheiros, equipes)
+   ===================================================== */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--border);
+    border: 2px solid var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.avatar.sm { width: 28px; height: 28px; }
+.avatar.lg { width: 64px; height: 64px; }
+
+
+
+/* =====================================================
+   LISTA CORPORATIVA (com avatar, título, subtítulo)
+   ===================================================== */
+.corp-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.corp-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    transition: background var(--trans-fast);
+}
+
+.corp-list-item:hover {
+    background: rgba(0,0,0,0.03);
+}
+
+.corp-list-item .title {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.corp-list-item .subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+
+
+/* =====================================================
+   TABELA CORPORATIVA AVANÇADA (mais densa)
+   ===================================================== */
+.table-advanced {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+.table-advanced thead th {
+    background: rgba(0,0,0,0.035);
+    color: var(--text-muted);
+    text-align: left;
+    padding: 12px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-advanced tbody td {
+    padding: 14px 18px;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+}
+
+.table-advanced tbody tr:hover td {
+    background: rgba(59,130,246,0.04);
+}
+
+
+
+
+/* ============================================
+   Bloco 8 — Componentes Interativos:
+   Modais, Dropdowns, Tooltips, Tabs, Accordions, Steps
+   ============================================ */
+
+/* =====================================================
+   MODAL (overlay + conteúdo)
+   ===================================================== */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--trans-med) var(--trans-ease);
+    z-index: 500;
+}
+
+.modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    max-width: 600px;
+    width: 90%;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-20px);
+    transition: all var(--trans-med) var(--trans-ease);
+}
+
+.modal-backdrop.active .modal {
+    transform: translateY(0);
+}
+
+/* =====================================================
+   DROPDOWN (botão + lista)
+   ===================================================== */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 160px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: 8px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all var(--trans-fast) var(--trans-ease);
+    z-index: 300;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background var(--trans-fast);
+}
+
+.dropdown-item:hover {
+    background: rgba(59,130,246,0.06);
+    color: var(--primary);
+}
+
+/* =====================================================
+   TOOLTIP
+   ===================================================== */
+.tooltip {
+    position: absolute;
+    background: var(--bg-card);
+    color: var(--text-main);
+    border-radius: var(--radius-md);
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-md);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--trans-fast) var(--trans-ease);
+    pointer-events: none;
+    z-index: 400;
+}
+
+.tooltip.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =====================================================
+   TABS
+   ===================================================== */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    gap: var(--space-4);
+}
+
+.tab {
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: color var(--trans-fast), border-color var(--trans-fast);
+}
+
+.tab.active {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* =====================================================
+   ACCORDION
+   ===================================================== */
+.accordion {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.accordion-item {
+    border-bottom: 1px solid var(--border);
+}
+
+.accordion-header {
+    padding: var(--space-4);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    background: var(--bg-card);
+    transition: background var(--trans-fast);
+}
+
+.accordion-header:hover {
+    background: rgba(59,130,246,0.06);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--trans-med) var(--trans-ease);
+    padding: 0 var(--space-4);
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 500px; /* grande o suficiente para conteúdo */
+    padding: var(--space-3) var(--space-4);
+}
+
+/* =====================================================
+   STEPS / Wizard
+   ===================================================== */
+.steps {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: 600;
+    color: var(--text-muted);
+    position: relative;
+}
+
+.step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--bg-card);
+}
+
+.step.active .step-circle {
+    background: var(--primary);
+    color: var(--bg-card);
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    height: 2px;
+    background: var(--border);
+    flex: 1;
+    display: block;
+    margin-left: var(--space-3);
+}
+.step.active:not(:last-child)::after {
+    background: var(--primary);
+}
+
+
+
+
+
+/* =====================================================
+   Bloco 9: Dashboard / Grid de Aplicativos
+   ===================================================== */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+}
+
+.app-link-card {
+    display: block;
+    padding: var(--space-6);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-main);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.app-link-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--primary);
+}
+
+.app-icon {
+    color: var(--primary);
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+    display: block;
+}
+
+.app-link-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+    font-weight: 700;
+}
+
+.app-link-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+
+
+
+
+/* ===========================================================
+   Bloco 10 — Estilos da Logo/Brand Header (Tema)
+   =========================================================== */
+.brand-header {
+    /* Garante que o container da logo e texto usem cores de tema */
+    color: var(--text-main);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-2);
+}
+
+.brand-header img {
+    /* Define a logo padrão (Tema Light) */
+    content: url('/static/img/nexus_logo.png'); 
+    width: 100px;
+    height: 100px;
+    transition: content 0.3s ease;
+}
+
+/* Regra CRÍTICA: Sobrescreve a logo quando o tema for DARK */
+html[data-theme="dark"] .brand-header img {
+    content: url('/static/img/nexus_logo_dark.png');
+}
+
+
+
+/* Bloco 13: Estilos da Sidebar NEXUS (Refatoração de 2025) */
+.sidebar.left .nav-group-title {
+    /* Cor e Tamanho do Título do Grupo */
+    font-size: 0.75rem; /* Títulos menores para seções */
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 15px 5px 15px; /* Padding interno */
+    
+    /* CRÍTICO: Espaçamento para separação de grupo */
+    margin-top: 20px; 
+}
+
+/* Garante que o primeiro grupo não tenha margem superior excessiva */
+.sidebar.left .nav-links .nav-group-title:first-child {
+    margin-top: 0;
+}
+
+/* Ajusta o padding interno dos links para alinhar com o padding do título */
+.sidebar.left .nav-link {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Ajusta a aparência do rodapé */
+.sidebar-footer {
+    padding: 20px 15px 10px 15px;
+    border-top: 1px solid var(--border);
+    margin-top: auto; /* Empurra para o fundo da sidebar */
+    text-align: center;
+}
+
+.sidebar-footer > span {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+}

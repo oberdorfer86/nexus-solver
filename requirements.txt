@@ -1,8 +1,9 @@
+# Bloco 1: Dependências Globais (Core e Micro-apps)
+# -----
 fastapi
-uvicorn[standard]
+uvicorn[standard] # Uvicorn com dependências padrão (Ex: websockets)
 jinja2
-sympy
-matplotlib
-numpy
-pydantic
-multipart
+python-multipart # Para lidar com dados de formulários
+sympy             # Dependência matemática central (Solver)
+numpy             # Dependência matemática para SymPy/Plotting (Solver)
+# -----
