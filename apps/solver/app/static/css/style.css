@@ -332,23 +332,23 @@ body.nexus-visible.sidebar-visible .main-content {
 
 
 
-/* ===============================================================================================*/
-/* ===============================================================================================*/
+/* ======================================================= */
 /* Bloco 5: Estilos da Toolbar/Abas de Navegação (Master-Detail) */
+/* ======================================================= */
+
 /* === TOOLBAR (Horizontal Fix) === */
 #tab-controls-container {
-    /* Container para posicionar as abas LADO A LADO FIXAS */
     display: flex;
     gap: 5px;
-    margin-bottom: 0; /* Remove a margem para colar no conteúdo */
+    margin-bottom: 0;
     z-index: 10; 
 }
 
 /* Estilo Base para as Abas (Handles) */
 .tab-handle {
-    position: relative; /* Mantém no fluxo normal */
+    position: relative;
     height: 36px; 
-    width: 160px; /* AJUSTED: slightly narrower handles */
+    width: 160px;
     padding: 0 10px;
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -359,9 +359,8 @@ body.nexus-visible.sidebar-visible .main-content {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    z-index: 15; /* Alto Z-index para flutuar */
+    z-index: 15;
 }
-/* Estilo para o Título do Handle */
 .tab-handle .handle-title, .tab-handle h2 {
     font-size: 0.9rem;
     font-weight: 600;
@@ -372,31 +371,28 @@ body.nexus-visible.sidebar-visible .main-content {
     white-space: nowrap;
 }
 
-/* ABA INATIVA - Fica atrás, com borda escura */
+/* ABA INATIVA */
 .tab-handle.inactive {
     z-index: 10;
     border-color: var(--border);
     color: var(--text-muted);
-    background: var(--bg-app); /* Fundo mais escuro */
+    background: var(--bg-app);
 }
-/* Aba inativa quando hover */
 .tab-handle.inactive:hover {
     background: var(--bg-card);
     color: var(--primary);
 }
 
-/* ABA ATIVA - Fica na frente, com borda clara, e "corta" a borda de baixo */
+/* ABA ATIVA */
 .tab-handle.active {
     z-index: 20;
     border-color: var(--border);
     color: var(--primary);
     background: var(--bg-card);
-    /* Keep active/inactive box model identical to avoid layout shift */
     margin-top: 0;
     height: 36px;
     padding-left: 1px;
     padding-right: 1px;
-    /* Use a subtle inner highlight instead of changing size */
     box-shadow: inset 0 -3px 0 0 rgba(59,130,246,0.08);
 }
 
@@ -405,36 +401,29 @@ body.nexus-visible.sidebar-visible .main-content {
 /* ---------------------------------------------------- */
 
 #tab-content-area {
-    /* Reposiciona o conteúdo para cobrir a área abaixo das abas */
     position: relative;
     top: 0;
     left: 0;
     width: 100%;
-    margin-top: -1px; /* CRÍTICO: Cola na aba ativa */
+    margin-top: -1px;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 0 var(--radius) var(--radius) var(--radius); /* Arredonda todos, exceto canto superior esquerdo para dar espaço para o handle */
-    /* CORREÇÃO CRÍTICA: Remove o padding principal. O padding será aplicado dentro dos painéis (.toolbar-content) */
+    border-radius: 0 var(--radius) var(--radius) var(--radius);
     padding: 0; 
     box-shadow: var(--shadow);
-    z-index: 1; /* Fica abaixo dos handles */
-    /* NOVO: Adiciona overflow hidden para isolar o conteúdo interno */
+    z-index: 1;
     overflow: hidden; 
 }
 
-/* CORREÇÃO CRÍTICA: As abas mestras devem ser display: block ou display: none */
 .tab-pane { 
-    /* CRÍTICO: Garante que as abas inativas sejam escondidas */
     display: none !important; 
-    /* NOVO: Adiciona altura automática para o conteúdo */
     height: auto; 
 } 
 .tab-pane.active { 
-    /* CRÍTICO: As abas ativas são blocos que definem o layout do seu conteúdo */
     display: block !important; 
 }
 
-/* NOVO: Estilo para os Títulos de Seção de Funções/Fórmulas */
+/* Estilo RESTAURADO para os Títulos de Seção (Visíveis, como você os viu) */
 .toolbar-section-title {
     font-weight: 700;
     font-size: 0.85rem;
@@ -445,22 +434,23 @@ body.nexus-visible.sidebar-visible .main-content {
     margin-top: 15px;
     margin-bottom: 5px;
     text-align: center;
+    /* Linha 'display: none;' REMOVIDA */
 }
+
 /* Garante que o conteúdo da aba Funções/Fórmulas flua verticalmente */
 #toolbar-content-area .toolbar-content, #formula-content-area {
     display: block !important; 
-    padding-top: 0;
-    /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
     padding: 0 2px 2px 2px; 
 }
+
     /* By default category panes are hidden; JS will show the selected category pane */
     #toolbar-content-area .toolbar-pane, #formula-content-area .formula-pane {
         display: none;
-        padding: 0; /* Remove padding desnecessário */
+        padding: 0;
     }
 
 
-/* NÍVEL 2: CATEGORIAS (Navegação Master-Detail REMOVIDA) */
+/* NÍVEL 2: CATEGORIAS (REMOVIDO: Navegação Horizontal) */
 .toolbar-tabs, .formula-category-list {
     /* Oculta as listas de navegação verticais de ambas as abas */
     display: none; 
@@ -471,146 +461,65 @@ body.nexus-visible.sidebar-visible .main-content {
     padding-bottom: 10px;
 }
 
-    /* Category navigation (level-2 titles transformed into tabs) */
-    .category-nav {
-        display: flex;
-        gap: 1px;
-        align-items: center;
-        padding: 4px 3px;
-        overflow-x: auto;
-        margin-bottom: 12px;
-    }
-    .category-nav .cat-btn {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        padding: 8px 12px;
-        border-radius: 10px;
-        cursor: pointer;
-        color: var(--text-main);
-        font-weight: 600;
-        white-space: nowrap;
-    }
-    .category-nav .cat-btn.active {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-    }
+/* REMOVIDO: Todos os estilos .category-nav */
+/* REMOVIDO: Todos os estilos de scroll horizontal */
 
-    @media (max-width: 900px) {
-        .category-nav { padding: 6px 0; }
-        .category-nav .cat-btn { padding: 6px 10px; }
-    }
 
-    /* Smaller button sizing specifically for formula panes - ESTA REGRA FOI REMOVIDA 
-       para que todos os botões usem a nova dimensão de 48px do Bloco 7 */
-    
 /* NÍVEL 3: COMANDOS DE CÁLCULO (Agrupamento Vertical) */
 
 .toolbar-pane > div, .formula-content-details { 
-    /* Container que contém todos os grupos (Deve ser VERTICAL) */
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Espaçamento entre grupos de botões */
-    padding-top: 5px; /* Reduzido o padding top */
+    gap: 15px;
+    padding-top: 5px;
 }
 
-/* CORREÇÃO CRÍTICA: Configura o toolbar-pane para layout horizontal rolável (Funções) */
 .toolbar-pane {
-    display: none !important; /* Inicia todos os painéis de categoria como escondidos */
-    flex-direction: row !important; /* Define a direção flexível para quando for ativado */
-    flex-wrap: nowrap; 
-    overflow-x: auto !important; /* Mantém scroll horizontal */
-    overflow-y: hidden !important; /* CRÍTICO: Remove forçadamente scroll vertical */
-    padding-bottom: 10px; 
+    display: block !important; 
+    flex-direction: column !important; /* Volta para o layout vertical */
+    overflow-x: hidden !important; /* Desativa scroll horizontal */
+    overflow-y: hidden !important; 
+    padding-bottom: 0; 
     align-items: flex-start; 
     gap: 15px; 
     padding-top: 15px; 
 }
-/* CRÍTICO: Força o painel .active a ser exibido como FLEX. Este é o painel BÁSICO no carregamento inicial. */
+
 .toolbar-pane.active {
-    display: flex !important;
-}
-/* Estilos da scrollbar horizontal no .toolbar-pane */
-.toolbar-pane::-webkit-scrollbar {
-    height: 8px;
-}
-.toolbar-pane::-webkit-scrollbar-thumb {
-    background-color: var(--primary);
-    border-radius: 10px;
-    border: 2px solid var(--bg-card);
-}
-.toolbar-pane::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-/* O formula-content-details já está com display block acima, vamos garantir o reset */
-.formula-content-details {
     display: block !important;
-    margin-top: 0;
-    /* NOVO: Aplica o padding horizontal e inferior que estava no #library-content-scroll */
-    padding: 0 2px 2px 2px; 
 }
 
-
-/* Correção Definitiva – Grid das Funções */
-/* Este bloco é AGORA obsoleto e será substituído por um estilo de grupo flex */
-
-
-/* CORREÇÃO CRÍTICA: O Separador AGORA é VERTICAL */
+/* Oculta os divisores horizontais originais */
 .divider {
-    /* Oculta os divisores horizontais originais */
     display: none !important;
 }
-
-/* NOVO: Separador Vertical entre os Grupos */
-/* Estilo para que o JS possa inserir um divisor vertical */
-.toolbar-pane .divider {
-    display: block !important;
-    width: 1px;
-    height: 100%; 
-    background: var(--border);
-    margin: 0; 
-    flex-shrink: 0; 
-}
-
 
 /* FÓRMULAS DETALHE (Conteúdo Nível 3) */
 .formula-content-details h3, .formula-content-details h2 {
-    /* Oculta os cabeçalhos H2/H3 internos, pois usamos .toolbar-section-title */
     display: none !important; 
 }
+
 .formula-content-details .formula-pane {
-    /* Inicia escondido (será sobrescrito pelo .active abaixo) */
     display: none !important;
-    padding-bottom: 0; 
-    
-    /* NOVO: Configura o container para ROLAGEM HORIZONTAL */
-    flex-direction: row !important; 
-    flex-wrap: nowrap; 
-    overflow-x: auto !important; /* Mantém scroll horizontal */
-    overflow-y: hidden !important; /* Remove scroll vertical */
-    
-    align-items: flex-start; 
-    gap: 15px; /* Espaçamento entre os itens de fórmula na horizontal */
-    padding-top: 15px; 
-}
-.formula-content-details .formula-pane.active {
-    /* CRÍTICO: Configura o painel ativo de fórmulas para GRID 2xN horizontal */
-    display: grid !important; 
-    /* 2 linhas de 120px de altura */
-    grid-template-rows: 120px 120px; 
-    /* Colunas automáticas para cada item, sem quebras */
-    grid-auto-columns: 280px; 
-    grid-auto-flow: column; /* Faz com que os itens preencham horizontalmente */
-    
     padding: 0;
-    gap: 15px; /* Espaçamento entre colunas/itens */
+    flex-direction: column !important;
+    overflow-x: hidden !important; 
+    overflow-y: hidden !important;
+    align-items: flex-start; 
+    gap: 15px;
     padding-top: 15px;
 }
 
-/* STRONG GUARD: Garantir que qualquer .formula-pane só seja visível
-   quando o container mestre #formula-content-area estiver ativo. Isso
-   evita que painéis de fórmula apareçam enquanto a aba Funções estiver ativa. */
+.formula-content-details .formula-pane.active {
+    display: grid !important; 
+    grid-template-rows: 120px 120px; 
+    grid-auto-columns: 280px; 
+    grid-auto-flow: column;
+    padding: 0;
+    gap: 15px;
+    padding-top: 15px;
+}
+
 #formula-content-area .formula-pane { display: none !important; }
 #formula-content-area.active .formula-pane.active { display: grid !important; }
 
@@ -1199,28 +1108,32 @@ math-field:focus, math-field:focus-within { outline: none; }
 /* Bloco 10: Botões de Ação (Calculo, Limpar, Salvar Var) */
 /* ======================================================= */
 
-/* NOVO: Estilo para o grupo de botões "Limpar" e "Calcular" */
+/* REMOVIDO: .expression-row (Para consertar o layout horizontal quebrado) */
+/* REMOVIDO: .button-group-side (Para consertar o layout horizontal quebrado) */
+
+
+/* Estilos Restaurados para o Agrupamento Vertical (Abaixo do Input) */
 .button-group-bottom {
-    display: flex; /* Alinha os itens em linha */
-    gap: var(--space-3); /* Espaçamento entre os botões */
-    margin-top: var(--space-4); /* Espaço acima do grupo */
-    margin-bottom: var(--space-4); /* Espaço abaixo do grupo */
-    width: 100%; /* Ocupa a largura total */
+    display: flex;
+    gap: 15px; /* Espaço entre os botões */
+    margin-top: 15px; /* Espaço entre o input e os botões */
+    width: 100%;
 }
 
 .button-group-bottom .btn {
-    flex: 1; /* Faz com que os botões dividam o espaço igualmente */
-    min-height: 48px; /* Altura mínima para botões de ação */
+    flex-grow: 1; /* Faz com que os botões ocupem a largura total */
+    min-height: 48px;
     font-size: 1rem;
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2); /* Espaço entre ícone e texto */
+    gap: var(--space-2);
 }
 
-/* Estilos para o botão Limpar */
+
+/* Estilos para o botão Limpar (Vermelho) */
 .btn-red {
     background-color: var(--danger);
     color: var(--white);
@@ -1260,17 +1173,6 @@ math-field:focus, math-field:focus-within { outline: none; }
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-/* Antigos estilos de botões que podem ser removidos/refatorados */
-/*
-#calculate-btn { ... }
-#clear-btn { ... }
-*/
-
-/* NOVO: Estilos para o botão de Salvar Variável (se ele for movido ou ajustado) */
-#save-var-btn {
-    /* Estilos se este botão for separado, caso contrário, será incluído em algum grupo */
 }
 
 

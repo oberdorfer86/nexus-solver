@@ -493,9 +493,6 @@ if (keyboardToggleBtn) {
 // -----
 
   
-
-
-
 // Bloco 5: Lógica de Toggles de Sidebar (Histórico e Nexus)
 // -----
 if (sidebarToggle && sidebar) {
@@ -580,8 +577,6 @@ if (nexusToggle && nexusSidebar) {
     });
 }
 // -----
-
-
 
 
 
@@ -877,11 +872,9 @@ if (nexusToggle && nexusSidebar) {
     }
     // -----
 
-    
-    
-    
+    // ===============================================================================================
     // Bloco 12: Função de Cálculo Principal
-// -----
+    // -----
     async function performCalculation() {
         if (!mf) return;
         const rawExpression = mf.getValue("ascii-math"); 
@@ -986,14 +979,7 @@ if (nexusToggle && nexusSidebar) {
             if (mf) mf.focus(); 
         }
     }
-// -----
-
-
-
-
-
-
-
+    // -----
 
 
 // Bloco 13: Lógica de Toggles de Tema e Toolbar
@@ -1107,25 +1093,4 @@ window.addEventListener('resize', solverApplyResponsiveVisibility);
     }
 // -----
 
-
-
-
-// Bloco 17: Lógica do Botão Toggle (Mobile)
-// -----
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', (e) => {
-            e.stopPropagation(); // Previne conflitos com o Bloco 6 (Clique Externo)
-            
-            // Toggle do estado 'open'
-            const isOpen = sidebar.classList.toggle('open');
-            
-            // Gerencia a classe de deslocamento no body 
-            if (isOpen) {
-                _safeAddClass(body, 'sidebar-visible');
-            } else {
-                _safeRemoveClass(body, 'sidebar-visible');
-            }
-        });
-    }
-
-// -----
+}; // Fim do window.onload

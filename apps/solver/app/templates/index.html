@@ -24,99 +24,78 @@
 
 {% block content %}
 <div class="solver-page" data-nexus-block="2:Conteudo Principal (Micro-App)">
-    
-    <div class="main-content-wrapper">
 
-        <div class="tabs-container">
-            <div class="tab-controls" id="tab-controls-container">
-                <div class="tab-handle active" data-tab="toolbar-content-area" id="toolbar-main">
-                    <span class="material-icons-round">apps</span> Funções
-                </div>
-                <div class="tab-handle" data-tab="formula-content-area" id="formula-container">
-                    <span class="material-icons-round">description</span> Fórmulas
-                </div>
-            </div>
+    <div class="editor-section">
+        <div id="functions-panel-container"></div>
 
-            <div class="tab-content-area">
-                <div class="tab-pane active" id="toolbar-content-area">
-                    {% include 'components/toolbar_panel.html' %}
-                </div>
-                <div class="tab-pane" id="formula-content-area">
-                    {% include 'components/formula_panel.html' %}
-                </div>
+        <div class="variables-panel">
+            <div class="variables-header">
+                <span class="panel-title">
+                    <span class="material-icons-round" style="font-size: 1.1rem;">data_object</span>
+                    Variáveis de Projeto
+                </span>
+                <button id="add-variable-btn" class="btn-xs primary" title="Adicionar nova variável">
+                    <span class="material-icons-round">add</span> Nova
+                </button>
             </div>
+            <div id="variables-list" class="variables-grid"></div>
         </div>
 
-        <div class="input-actions-block">
-            <div class="input-group">
+        <div class="unified-input-wrapper">
+            <div class="label-group">
                 <input type="text" id="calc-label" placeholder="Nomeie este cálculo (ex: Momento Máximo)...">
             </div>
 
-            <div class="input-group unified-input-wrapper">
-                <label for="math-editor" class="sr-only">Digite sua expressão</label>
-                <math-field id="math-editor" virtual-keyboard-mode="manual" 
-                           class="mf-initial"
-                           placeholder="Digite sua expressão..."
-                           data-nexus-block="3:Campo de Expressão MathLive">
-                </math-field>
-                <button id="keyboard-toggle" class="icon-btn keyboard-toggle-btn" title="Alternar Teclado Virtual" aria-label="Alternar Teclado Virtual">
-                    <span class="material-icons-round">keyboard</span>
-                </button>
-            </div>
-            
-            <div class="button-group-bottom">
-                <button id="clear-btn" class="btn btn-red icon-btn-text">
-                    <span class="material-icons-round">delete</span> Limpar
-                </button>
-                <button id="calculate-btn" class="btn btn-primary icon-btn-text">
-                    <span class="material-icons-round calculate-icon">calculate</span> Calcular
-                </button>
-            </div>
-
-
-            <div class="codes-toggle-section">
-                <button class="btn btn-secondary icon-btn-text" id="toggle-codes-btn">
-                    <span class="material-icons-round">code</span> Ver Códigos (Excel / LaTeX)
-                </button>
-                <div class="codes-output-area hidden" id="codes-output-area">
-                    <div class="input-group">
-                        <label for="excel-code">Excel</label>
-                        <textarea id="excel-code" readonly></textarea>
-                        <button class="copy-btn" data-target="excel-code">Copiar</button>
-                    </div>
-                    <div class="input-group">
-                        <label for="latex-code">LaTeX</label>
-                        <textarea id="latex-code" readonly></textarea>
-                        <button class="copy-btn" data-target="latex-code">Copiar</button>
-                    </div>
+            <div class="input-group">
+                <math-field id="math-editor" smart-mode placeholder="Digite\ sua\ expressão..."></math-field>
+                <div class="editor-actions">
+                    <button id="clear-btn" class="btn-primary danger" title="Limpar Tudo">
+                        <span class="material-icons-round">delete_outline</span>
+                        Limpar
+                    </button>
+                    <button id="calculate-btn" class="btn-primary">
+                        <span class="material-icons-round calculate-icon">calculate</span>
+                        <span class="material-icons-round loading-icon">autorenew</span>
+                        Calcular
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="result-area hidden" id="result-area">
-            <h2>Resultado</h2>
-            <div class="input-group">
-                <label for="result-output" class="sr-only">Resultado</label>
-                <math-field id="result-output" readonly data-nexus-block="4:Campo de Resultado MathLive"></math-field>
+        <details class="tech-footer">
+            <summary>
+                <span class="material-icons-round" style="font-size:1.1rem; color:var(--text-muted);">code</span>
+                <span style="margin-left: 5px;">Ver Códigos (Excel / LaTeX)</span>
+            </summary>
+            <div class="tech-content">
+                <div class="tech-group">
+                    <label for="excel-code">Para Excel:</label>
+                    <input type="text" id="excel-code" readonly placeholder="O código Excel aparecerá aqui..." onclick="this.select()">
+                </div>
+                <div class="tech-group">
+                    <label for="latex-code">LaTeX:</label>
+                    <input type="text" id="latex-code" readonly placeholder="O código LaTeX aparecerá aqui..." onclick="this.select()">
+                </div>
             </div>
-            <div id="plot-container" style="display: none; width: 100%; height: 400px; margin-top: 15px;">
-                <div id="plotly-graph" style="width: 100%; height: 100%;"></div>
-            </div>
-        </div>
+        </details>
     </div>
 
-    <div id="virtual-keyboard-container" class="virtual-keyboard-container">
+    <div id="result-area" class="result-card hidden">
+        <div class="result-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <h3>Resultado</h3>
+                <button id="save-var-btn" class="btn-secondary save-result-btn" title="Salvar resultado como Variável">
+                    <span class="material-icons-round">save_alt</span> Salvar como Variável
+                </button>
+            </div>
         </div>
 
-    <div id="history-sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Histórico</h3>
-            <button id="clear-history-btn" class="btn btn-sm btn-secondary">Limpar Tudo</button>
+        <math-field id="result-output" read-only style="font-size: 2.2rem;"></math-field>
+
+        <div id="plot-container">
+            <div id="plotly-graph" style="width:100%; height:500px;"></div>
         </div>
-        <ul id="history-list" class="history-list">
-            </ul>
     </div>
-
 </div>
 {% endblock %}
 
@@ -124,36 +103,10 @@
 
 
 
-<div class="toolbar-content" data-nexus-block="3:Conteudo da Toolbar (Funções)">
-    
-    <div class="category-nav">
-        </div>
-    
-    <div class="toolbar-pane active" id="pane-basico" data-name="BÁSICO">
-        <div class="toolbar-section-title">Funções Básicas</div>
-        <div class="toolbar-group" data-group-name="Operadores">
-            <button class="toolbar-btn" data-latex="+" title="Adição">+</button>
-            <button class="toolbar-btn" data-latex="*" title="Multiplicação">*</button>
-            <button class="toolbar-btn" data-latex="\frac{\square}{\square}" title="Fração (Divisão)">
-                <span class="fraction-icon">
-                    <span class="square-placeholder small"></span>
-                    <span class="fraction-line"></span>
-                    <span class="square-placeholder small sub"></span>
-                </span>
-            </button>
-            <button class="toolbar-btn" data-latex="/" title="Divisão">/</button>
-            <button class="toolbar-btn" data-latex="\Delta" title="Variação Delta">&Delta;</button>
-        </div>
-        
-        <div class="toolbar-group" data-group-name="Constantes">
-            <button class="toolbar-btn" data-latex="-" title="Subtração">-</button>
-            <button class="toolbar-btn" data-latex="()" title="Parênteses">()</button>
-            <button class="toolbar-btn" data-latex="\pi" title="Pi">&pi;</button>
-            <button class="toolbar-btn" data-latex="=" title="Igualdade">=</button>
-            <button class="toolbar-btn" data-latex="e" title="Euler">e</button>
-            <button class="toolbar-btn" data-latex="\infty" title="Infinito">&infin;</button>
-        </div>
-        
-        </div>
-    
-</div>
+{% block extra_scripts %}
+<script data-nexus-block="3:Scripts Extras" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script defer src="//unpkg.com/mathlive"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+<script type="module" src="{{ url_for('functions_panel_static', path='index.js') }}?v=1.0"></script>
+<script src="{{ url_for('solver_static', path='js/main.js') }}?v=8.4"></script>
+{% endblock %}
